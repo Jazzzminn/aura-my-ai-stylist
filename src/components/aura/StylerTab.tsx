@@ -128,8 +128,13 @@ function Mannequin({
 }) {
   return (
     <div className="relative mx-auto aspect-[3/5] w-full max-w-xs">
-      {/* silhouette */}
-      <svg viewBox="0 0 100 170" className="absolute inset-0 h-full w-full" aria-hidden>
+      {/* silhouette — subtle ghost underlay, scaled to 55% and faded */}
+      <svg
+        viewBox="0 0 100 170"
+        className="absolute inset-0 h-full w-full"
+        style={{ opacity: 0.15, transform: "scale(0.55)", transformOrigin: "center center" }}
+        aria-hidden
+      >
         <defs>
           <linearGradient id="mannequin" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0%" stopColor="#EFE6D9" />
@@ -152,23 +157,23 @@ function Mannequin({
         empty={shoesEmpty}
         onAdd={onAdd}
         compact
-        style={{ top: "78%", height: "22%", zIndex: 1 }}
+        style={{ top: "80%", height: "20%", zIndex: 1 }}
       />
-      {/* Bottom — middle layer */}
+      {/* Bottom — middle layer, substantial and grounded, overlaps behind top at waist */}
       <GarmentLayer
         garment={bottom}
         empty={bottomsEmpty}
         onAdd={onAdd}
-        style={{ top: "40%", height: "38%", zIndex: 2 }}
+        style={{ top: "32%", height: "48%", zIndex: 2 }}
       />
-      {/* Top — front layer with subtle drop-shadow */}
+      {/* Top — front layer, sits above bottom at waistband */}
       <GarmentLayer
         garment={top}
         empty={topsEmpty}
         onAdd={onAdd}
         style={{
-          top: "5%",
-          height: "35%",
+          top: "6%",
+          height: "32%",
           zIndex: 3,
           filter: "drop-shadow(0 6px 10px rgba(45,42,38,0.18))",
         }}
