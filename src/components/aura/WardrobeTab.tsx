@@ -9,12 +9,12 @@ import { Plus, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import type { Garment } from "@/lib/aura";
 
-// Tile dimensions — enlarged for better visibility.
-const TILE_W = 200;
-const TILE_H = 260;
-const TALL_H = 340;
-const ACC_W = 200;
-const ACC_H = 240;
+// Tile dimensions — sized so the delete badge stays inside the scroll row.
+const TILE_W = 160;
+const TILE_H = 210;
+const TALL_H = 280;
+const ACC_W = 160;
+const ACC_H = 200;
 
 export function WardrobeTab() {
   const { wardrobe, openAddItem, removeGarment, renameGarment } = useAura();
@@ -136,7 +136,7 @@ function ScrollRow({ children, className = "" }: { children: React.ReactNode; cl
   return (
     <div className={`relative ${className}`}>
       <div
-        className="overflow-x-auto wardrobe-scroll"
+        className="overflow-x-auto wardrobe-scroll pt-2 -mt-2"
         style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
       >
         {children}
@@ -224,7 +224,7 @@ function Drawer({
       <CollapsibleContent>
         <div className="relative px-4 pb-4">
           <div
-            className="overflow-x-auto wardrobe-scroll"
+            className="overflow-x-auto wardrobe-scroll pt-2 -mt-2"
             style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
           >
             <div className="flex gap-3">
