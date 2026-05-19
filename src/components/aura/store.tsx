@@ -1,25 +1,11 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   INITIAL_OUTFITS,
   INITIAL_WARDROBE,
   type Garment,
   type Outfit,
 } from "@/lib/aura";
-
-const WARDROBE_KEY = "aura.wardrobe.v1";
-
-function loadWardrobe(): Garment[] {
-  if (typeof window === "undefined") return INITIAL_WARDROBE;
-  try {
-    const raw = window.localStorage.getItem(WARDROBE_KEY);
-    if (!raw) return INITIAL_WARDROBE;
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed)) return parsed as Garment[];
-    return INITIAL_WARDROBE;
-  } catch {
-    return INITIAL_WARDROBE;
-  }
-}
+import { getWardrobeFor, setWardrobeFor } from "@/lib/mock-db";
 
 export type Post = { id: string; name: string; photoUrl: string };
 
@@ -47,19 +33,26 @@ const Ctx = createContext<AuraState | null>(null);
 
 export function AuraProvider({ children, initialEmail }: { children: ReactNode; initialEmail?: string }) {
   const [user, setUser] = useState({ name: "You", email: initialEmail ?? "" });
-  const [wardrobe, setWardrobe] = useState<Garment[]>(loadWardrobe);
+  // SSR-safe initial state; real data hydrates in the effect below.
+  const [wardrobe, setWardrobe] = useState<Garment[]>(INITIAL_WARDROBE);
   const [outfits, setOutfits] = useState<Outfit[]>(INITIAL_OUTFITS);
   const [aiEnabled, setAiEnabled] = useState(true);
   const [addItemOpen, setAddItemOpen] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
+  const hydratedFor = useRef<string | null>(null);
 
+  // Load this account's wardrobe from the mock DB whenever the email changes.
   useEffect(() => {
-    try {
-      window.localStorage.setItem(WARDROBE_KEY, JSON.stringify(wardrobe));
-    } catch {
-      // ignore quota/serialization errors
-    }
-  }, [wardrobe]);
+    const email = user.email;
+    setWardrobe(getWardrobeFor(email));
+    hydratedFor.current = email;
+  }, [user.email]);
+
+  // Persist wardrobe back to the mock DB, scoped to the current account.
+  useEffect(() => {
+    if (hydratedFor.current !== user.email) return;
+    setWardrobeFor(user.email, wardrobe);
+  }, [wardrobe, user.email]);
 
   const value = useMemo<AuraState>(
     () => ({
