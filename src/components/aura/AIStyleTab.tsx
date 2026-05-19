@@ -88,69 +88,22 @@ export function AIStyleTab() {
     setInput("");
     setTyping(true);
 
-    const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY as string | undefined;
-    const userMessage = `My wardrobe: ${JSON.stringify(wardrobe)}. My style: relaxed, warm neutrals, slightly oversized. Today's request: ${t}`;
-
-    console.log(
-      "Calling Google AI with key:",
-      API_KEY ? API_KEY.slice(0, 8) + "..." : "undefined",
-    );
-
     try {
-      if (!API_KEY) {
-        throw new Error(
-          "VITE_GOOGLE_API_KEY is undefined. Add it to .env as `VITE_GOOGLE_API_KEY=...` (no quotes, no spaces) and restart the dev server.",
-        );
-      }
-
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            system_instruction: {
-              parts: [{ text: AURA_SYSTEM_PROMPT }],
-            },
-            contents: [
-              { role: "user", parts: [{ text: userMessage }] },
-            ],
-            generationConfig: {
-              temperature: 0.8,
-              maxOutputTokens: 1000,
-            },
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const bodyText = await response.text();
-        console.error("Google AI API call failed:", {
-          status: response.status,
-          statusText: response.statusText,
-          body: bodyText,
-        });
-        let parsedMsg: string | undefined;
-        try {
-          parsedMsg = JSON.parse(bodyText)?.error?.message;
-        } catch {
-          /* not JSON */
-        }
-        throw new Error(parsedMsg ?? `HTTP ${response.status}: ${bodyText.slice(0, 200)}`);
-      }
-
-      const data = await response.json();
-      const raw: string = data.candidates[0].content.parts[0].text;
-
-      const match = raw.match(/\{[\s\S]*\}/);
-      const parsed = JSON.parse(match ? match[0] : raw) as StyleResponse;
-
+      await new Promise((r) => setTimeout(r, 700));
+      const key = matchAuraKey(t);
+      const matched = auraResponses[key];
+      const style: StyleResponse = {
+        outfit: matched.outfit,
+        headline: matched.headline,
+        reasoning: matched.reasoning,
+        alternatives: [],
+      };
       setMessages((m) => [
         ...m,
-        { id: `a-${Date.now()}`, role: "assistant", style: parsed },
+        { id: `a-${Date.now()}`, role: "assistant", style },
       ]);
     } catch (err) {
-      console.error("Error fetching AI style:", err);
+      console.error("Error:", err);
       const msg = err instanceof Error ? err.message : String(err);
       setMessages((m) => [
         ...m,
