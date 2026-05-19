@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { AuraProvider } from "@/components/aura/store";
 import { AddItemModal } from "@/components/aura/AddItemModal";
 import { WardrobeTab } from "@/components/aura/WardrobeTab";
@@ -9,6 +9,7 @@ import { OutfitsTab } from "@/components/aura/OutfitsTab";
 import { SettingsTab } from "@/components/aura/SettingsTab";
 import { Shirt, Sparkles, Images, Settings, User } from "lucide-react";
 import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
 
 const searchSchema = z.object({ email: z.string().optional() });
 
@@ -21,7 +22,25 @@ type TabKey = "wardrobe" | "styler" | "ai" | "outfits" | "settings";
 
 function AppShell() {
   const { email } = Route.useSearch();
+  const navigate = useNavigate();
   const [tab, setTab] = useState<TabKey>("wardrobe");
+  const [checked, setChecked] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data.session) {
+        navigate({ to: "/" });
+      } else {
+        setChecked(true);
+      }
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (!session) navigate({ to: "/" });
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
+
+  if (!checked) return null;
 
   return (
     <AuraProvider initialEmail={email}>
