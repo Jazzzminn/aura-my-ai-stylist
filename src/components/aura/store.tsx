@@ -73,7 +73,7 @@ export function AuraProvider({
   const [user, setUserState] = useState<{ name: string; email: string; id: string | null }>(
     { name: "You", email: initialEmail ?? "", id: null },
   );
-  const [wardrobe, setWardrobe] = useState<Garment[]>(INITIAL_WARDROBE);
+  const [wardrobe, setWardrobe] = useState<Garment[]>([]);
   const [outfits, setOutfits] = useState<Outfit[]>(INITIAL_OUTFITS);
   const [aiEnabled, setAiEnabled] = useState(true);
   const [addItemOpen, setAddItemOpen] = useState(false);
