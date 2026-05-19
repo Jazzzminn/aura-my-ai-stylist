@@ -1,12 +1,10 @@
 // Tiny client-side mock "database" for wardrobes, keyed by user email.
 // Persists to localStorage so data survives reloads, and seeds test@test.com
-// from the legacy global wardrobe (i.e. clothes the current user already added)
-// the first time that account is loaded.
+// from whatever clothes the user has already added under any other account.
 import { INITIAL_WARDROBE, type Garment } from "@/lib/aura";
 
 const LEGACY_KEY = "aura.wardrobe.v1";
 const NS = "aura.wardrobe.v1:";
-const SEEDED_FLAG = "aura.mockdb.seeded.v1";
 
 export const MOCK_TEST_EMAIL = "test@test.com";
 
@@ -25,51 +23,48 @@ function readKey(key: string): Garment[] | null {
   }
 }
 
-function ensureSeeded() {
-  if (typeof window === "undefined") return;
+// Find clothes anywhere in localStorage so we can seed the mock account.
+function findAnyExistingWardrobe(excludeKey?: string): Garment[] | null {
+  if (typeof window === "undefined") return null;
   try {
-    if (window.localStorage.getItem(SEEDED_FLAG)) return;
+    // 1. Legacy global key
+    const legacy = readKey(LEGACY_KEY);
+    if (legacy && legacy.length > 0) return legacy;
 
-    const testKey = keyFor(MOCK_TEST_EMAIL);
-    if (!window.localStorage.getItem(testKey)) {
-      // Prefer the clothes the user actually added (legacy global key),
-      // otherwise fall back to the curated INITIAL_WARDROBE.
-      const legacy = readKey(LEGACY_KEY);
-      const seed = legacy && legacy.length > 0 ? legacy : INITIAL_WARDROBE;
-      window.localStorage.setItem(testKey, JSON.stringify(seed));
+    // 2. Any other namespaced account's wardrobe
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const k = window.localStorage.key(i);
+      if (!k || !k.startsWith(NS) || k === excludeKey) continue;
+      const arr = readKey(k);
+      if (arr && arr.length > 0) return arr;
     }
-
-    window.localStorage.setItem(SEEDED_FLAG, "1");
   } catch {
     // ignore
   }
+  return null;
 }
 
 export function getWardrobeFor(email: string | undefined): Garment[] {
   if (typeof window === "undefined") return INITIAL_WARDROBE;
-  ensureSeeded();
 
   const normalized = (email ?? "").trim().toLowerCase();
   if (!normalized) {
     return readKey(LEGACY_KEY) ?? INITIAL_WARDROBE;
   }
 
-  const stored = readKey(keyFor(normalized));
-  if (stored) return stored;
+  const myKey = keyFor(normalized);
+  const stored = readKey(myKey);
+  if (stored && stored.length > 0) return stored;
 
-  // First time we see this email: migrate the legacy global wardrobe so the
-  // user's existing clothes carry over to their account.
-  const legacy = readKey(LEGACY_KEY);
-  if (legacy && legacy.length > 0) {
-    try {
-      window.localStorage.setItem(keyFor(normalized), JSON.stringify(legacy));
-    } catch {
-      // ignore
-    }
-    return legacy;
+  // First time loading this account: seed from any wardrobe the user already
+  // has on this device, so test@test.com (or any new account) is pre-filled.
+  const seed = findAnyExistingWardrobe(myKey) ?? INITIAL_WARDROBE;
+  try {
+    window.localStorage.setItem(myKey, JSON.stringify(seed));
+  } catch {
+    // ignore
   }
-
-  return INITIAL_WARDROBE;
+  return seed;
 }
 
 export function setWardrobeFor(email: string | undefined, garments: Garment[]) {
@@ -79,6 +74,6 @@ export function setWardrobeFor(email: string | undefined, garments: Garment[]) {
   try {
     window.localStorage.setItem(key, JSON.stringify(garments));
   } catch {
-    // ignore quota/serialization errors
+    // ignore
   }
 }
