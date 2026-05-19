@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import auraLogo from "@/assets/aura-logo.png";
 
 export const Route = createFileRoute("/")({
   component: Login,
