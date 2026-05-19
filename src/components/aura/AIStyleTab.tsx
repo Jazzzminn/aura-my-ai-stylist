@@ -28,7 +28,7 @@ const auraResponses = {
     headline: "Understated, on purpose",
     reasoning:
       "The black crewneck over the olive trousers is the kind of outfit that looks like you didn't try, which is exactly the point. The brown Chelsea boots ground it. Keep jewellery minimal — just the silver chain.",
-    outfit: ["top_001", "bottom_001", "shoes_003", "acc_005"],
+    outfit: ["t2", "b3", "s1", "a2"],
   },
   sunday: {
     headline: "Nowhere to be",
