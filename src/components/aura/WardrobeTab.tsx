@@ -1,36 +1,15 @@
 import { useAura } from "@/components/aura/store";
 import { GarmentVisual } from "@/components/aura/Garment";
-import type { Category } from "@/lib/aura";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Plus, ChevronDown, Upload } from "lucide-react";
-import { useState, useRef } from "react";
-import { toast } from "sonner";
+import { Plus, ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 export function WardrobeTab() {
-  const { wardrobe, addGarment } = useAura();
-  const [open, setOpen] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<Category | "">("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { wardrobe, openAddItem } = useAura();
   const [drawer1Open, setDrawer1Open] = useState(true);
   const [drawer2Open, setDrawer2Open] = useState(false);
 
@@ -38,49 +17,6 @@ export function WardrobeTab() {
   const bottoms = wardrobe.filter((g) => g.category === "bottom");
   const longs = wardrobe.filter((g) => g.category === "dress" || g.category === "outerwear");
   const acc = wardrobe.filter((g) => g.category === "accessory" || g.category === "shoes");
-
-  function handleOpenAdd() {
-    setPreviewUrl(null);
-    setSelectedFile(null);
-    setSelectedCategory("");
-    setOpen(true);
-  }
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  }
-
-  function handleClose() {
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setPreviewUrl(null);
-    setSelectedFile(null);
-    setSelectedCategory("");
-    setOpen(false);
-  }
-
-  function confirmAdd() {
-    if (!selectedFile || !selectedCategory) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      addGarment({
-        id: `u-${Date.now()}`,
-        name: "New Item",
-        category: selectedCategory,
-        color: "#C9A98E",
-        imageUrl: dataUrl,
-        dateAdded: new Date().toISOString(),
-      });
-      toast.success("Item added!", { position: "bottom-center", duration: 2000 });
-      handleClose();
-    };
-    reader.readAsDataURL(selectedFile);
-  }
 
   return (
     <div className="relative pb-28">
