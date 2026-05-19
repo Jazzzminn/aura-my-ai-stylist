@@ -230,11 +230,13 @@ function SwipeZone({
   className,
   onSwipe,
   label,
+  showArrows = true,
 }: {
   children: React.ReactNode;
   className?: string;
   onSwipe: (dir: 1 | -1) => void;
   label: string;
+  showArrows?: boolean;
 }) {
   const startX = useRef<number | null>(null);
   return (
