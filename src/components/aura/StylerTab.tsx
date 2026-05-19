@@ -158,8 +158,8 @@ function Mannequin({
           empty={topsEmpty}
           onAdd={onAdd}
           onSwipe={onSwipe}
-          width={240}
-          height={200}
+          width={260}
+          height={240}
           placeholderLabel="Add a top"
         />
         <FixedSlot
@@ -178,8 +178,8 @@ function Mannequin({
           empty={shoesEmpty}
           onAdd={onAdd}
           onSwipe={onSwipe}
-          width={220}
-          height={110}
+          width={180}
+          height={100}
           placeholderWidth={150}
           placeholderHeight={90}
           placeholderLabel="Add shoes"
@@ -237,8 +237,9 @@ function FixedSlot({
           src={garment.imageUrl}
           alt={garment.name}
           style={{
-            height,
-            width,
+            width: "100%",
+            height: "auto",
+            maxHeight: height,
             objectFit: "contain",
             display: "block",
             margin: "0 auto",
