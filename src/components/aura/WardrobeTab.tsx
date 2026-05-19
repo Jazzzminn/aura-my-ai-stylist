@@ -30,7 +30,7 @@ export function WardrobeTab() {
         {/* Hanging rail — tops */}
         <section className="col-span-2 rounded-2xl bg-card p-4 soft-shadow">
           <RailLabel>Hanging rail</RailLabel>
-          <HangingRail items={tops.slice(0, 3)} onRemove={removeGarment} />
+          <HangingRail items={tops.slice(0, 3)} onRemove={removeGarment} onRename={renameGarment} />
         </section>
 
         {/* Tall hanging — dresses/coats */}
