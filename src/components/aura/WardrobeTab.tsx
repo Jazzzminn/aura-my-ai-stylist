@@ -168,7 +168,7 @@ function HangingItem({
     <div className="relative flex flex-shrink-0 flex-col items-center">
       <div className="h-3 w-3 rounded-full border border-foreground/40" />
       <div className="h-2 w-px bg-foreground/30" />
-      <div className={`relative flex-shrink-0 ${tall ? "h-32 min-w-[120px] max-w-[140px]" : "h-28 min-w-[120px] max-w-[140px]"}`}>
+      <div className="relative flex-shrink-0 h-[200px] w-[160px]">
         <GarmentVisual
           garment={g}
           className="!h-full !w-full"
