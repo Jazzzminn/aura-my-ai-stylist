@@ -65,8 +65,75 @@ function matchAuraKey(text: string): AuraKey {
   if (lower.includes("date")) return "date";
   if (lower.includes("sunday") || lower.includes("lazy")) return "sunday";
   if (lower.includes("work") || lower.includes("office")) return "work";
-  if (lower.includes("party") || lower.includes("night out")) return "party";
+  if (lower.includes("party") || lower.includes("night")) return "party";
   return "default";
+}
+
+const AURA_SYSTEM_PROMPT = `You are Aura, a warm, perceptive personal stylist. Given a user's vibe/occasion and their wardrobe (array of items with id, name, category, color), respond with ONLY valid JSON in this shape:
+{
+  "headline": "short poetic title",
+  "reasoning": "2-3 sentences, warm and specific about why these pieces work",
+  "outfit": ["id1", "id2", "id3"],
+  "alternatives": []
+}
+Only use ids that exist in the provided wardrobe. No markdown, no commentary outside the JSON.`;
+
+async function getAuraOutfit(
+  userMessage: string,
+  wardrobe: { id: string; name: string; category: string; color: string }[],
+  temperature = 0.8,
+): Promise<StyleResponse & { source: "ai" | "fallback" }> {
+  const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+  try {
+    if (!API_KEY) throw new Error("Missing API key");
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `${AURA_SYSTEM_PROMPT}\n\nWardrobe: ${JSON.stringify(wardrobe)}\n\nUser: ${userMessage}`,
+                },
+              ],
+            },
+          ],
+          generationConfig: { temperature, maxOutputTokens: 1000 },
+        }),
+      },
+    );
+    if (!response.ok) throw new Error(`API error ${response.status}`);
+    const data = await response.json();
+    if (!data.candidates?.[0]) throw new Error("No candidates");
+    const text = data.candidates[0].content.parts[0].text as string;
+    const clean = text.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(clean);
+    if (!parsed.outfit || !parsed.reasoning) throw new Error("Bad response shape");
+    return {
+      source: "ai",
+      headline: parsed.headline ?? "Today's pick",
+      reasoning: parsed.reasoning,
+      outfit: parsed.outfit,
+      alternatives: parsed.alternatives ?? [],
+    };
+  } catch (err) {
+    console.warn(
+      "Gemini unavailable, using fallback:",
+      err instanceof Error ? err.message : String(err),
+    );
+    const key = matchAuraKey(userMessage);
+    const r = auraResponses[key];
+    return {
+      source: "fallback",
+      headline: r.headline,
+      reasoning: r.reasoning,
+      outfit: r.outfit,
+      alternatives: [],
+    };
+  }
 }
 
 export function AIStyleTab() {
