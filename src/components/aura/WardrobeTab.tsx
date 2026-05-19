@@ -212,11 +212,11 @@ function Drawer({
           {items.map((g) => (
             <div
               key={g.id}
-              className="relative flex min-w-[120px] max-w-[140px] flex-shrink-0 flex-col items-center rounded-xl bg-secondary/50 p-2"
+              className="relative h-[200px] w-[160px] flex-shrink-0"
             >
               <GarmentVisual
                 garment={g}
-                size="sm"
+                className="!h-full !w-full"
                 editableName
                 onRename={(n) => onRename(g.id, n)}
               />
