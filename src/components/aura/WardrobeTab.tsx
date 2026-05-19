@@ -142,7 +142,7 @@ function HangingRail({
 }) {
   return (
     <div className="relative mt-2 overflow-x-auto wardrobe-scroll" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
-      <div className="relative flex h-40 flex-nowrap items-start gap-3 pt-1">
+      <div className="relative flex flex-nowrap items-start gap-3 pt-1">
         <div className="absolute left-0 right-0 top-2 h-px bg-foreground/25" />
         {items.map((g) => (
           <HangingItem key={g.id} g={g} onRemove={onRemove} onRename={onRename} />
