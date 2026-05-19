@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+import { Pencil } from "lucide-react";
 import type { Garment } from "@/lib/aura";
 import { cn } from "@/lib/utils";
 
@@ -9,14 +11,20 @@ export function GarmentVisual({
   garment,
   size = "md",
   className,
+  editableName,
+  onRename,
 }: {
   garment: Garment;
   size?: "sm" | "md" | "lg";
   className?: string;
+  /** When set, renders the item name on a frosted strip at the bottom of the card. */
+  editableName?: boolean;
+  /** When provided, enables inline rename (pencil + long-press). */
+  onRename?: (newName: string) => void;
 }) {
   const dims = size === "sm" ? "h-14 w-14" : size === "lg" ? "h-40 w-40" : "h-24 w-24";
   return (
-    <div className={cn("relative flex items-center justify-center", dims, className)}>
+    <div className={cn("relative flex items-center justify-center overflow-hidden rounded-xl", dims, className)}>
       {garment.imageUrl ? (
         <img
           src={garment.imageUrl}
@@ -25,6 +33,105 @@ export function GarmentVisual({
         />
       ) : (
         <Shape category={garment.category} color={garment.color} />
+      )}
+      {editableName && (
+        <NameStrip name={garment.name} onRename={onRename} />
+      )}
+    </div>
+  );
+}
+
+function NameStrip({
+  name,
+  onRename,
+}: {
+  name: string;
+  onRename?: (newName: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(name);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pressTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (editing) {
+      setDraft(name);
+      requestAnimationFrame(() => inputRef.current?.focus());
+    }
+  }, [editing, name]);
+
+  function commit() {
+    const trimmed = draft.trim();
+    if (trimmed && trimmed !== name) onRename?.(trimmed);
+    setEditing(false);
+  }
+
+  function startPress(e: React.PointerEvent) {
+    if (!onRename) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    pressTimer.current = window.setTimeout(() => setEditing(true), 500);
+  }
+  function endPress() {
+    if (pressTimer.current) {
+      window.clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  }
+
+  return (
+    <div
+      onPointerDown={startPress}
+      onPointerUp={endPress}
+      onPointerLeave={endPress}
+      onPointerCancel={endPress}
+      className="group absolute inset-x-0 bottom-0 z-10"
+      style={{
+        backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
+        backgroundColor: "rgba(255,255,255,0.7)",
+      }}
+    >
+      {editing ? (
+        <input
+          ref={inputRef}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onBlur={commit}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              commit();
+            } else if (e.key === "Escape") {
+              setEditing(false);
+            }
+          }}
+          onClick={(e) => e.stopPropagation()}
+          className="serif w-full bg-transparent px-1.5 py-1 text-center text-[11px] text-foreground outline-none"
+          style={{ color: "#2D2A26" }}
+        />
+      ) : (
+        <div className="relative flex items-center justify-center px-1.5 py-1">
+          <span
+            className="serif truncate text-center text-[11px] leading-tight"
+            style={{ color: "#2D2A26" }}
+            title={name}
+          >
+            {name}
+          </span>
+          {onRename && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setEditing(true);
+              }}
+              aria-label="Rename item"
+              className="absolute right-1 top-1/2 -translate-y-1/2 grid h-4 w-4 place-items-center rounded-full text-foreground/60 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100 active:opacity-100"
+            >
+              <Pencil className="h-3 w-3" strokeWidth={1.75} />
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
