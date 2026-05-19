@@ -27,8 +27,9 @@ import { toast } from "sonner";
 export function WardrobeTab() {
   const { wardrobe, addGarment } = useAura();
   const [open, setOpen] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [preview, setPreview] = useState<typeof MOCK_NEW_ITEMS[number] | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | "">("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [drawer1Open, setDrawer1Open] = useState(true);
   const [drawer2Open, setDrawer2Open] = useState(false);
 
@@ -38,25 +39,46 @@ export function WardrobeTab() {
   const acc = wardrobe.filter((g) => g.category === "accessory" || g.category === "shoes");
 
   function handleOpenAdd() {
-    setPreview(null);
-    setProcessing(true);
+    setPreviewUrl(null);
+    setSelectedCategory("");
     setOpen(true);
-    setTimeout(() => {
-      const used = new Set(wardrobe.map((g) => g.id));
-      const next = MOCK_NEW_ITEMS.find((m) => !used.has(m.id)) ?? {
-        ...MOCK_NEW_ITEMS[0],
-        id: `n-${Date.now()}`,
-      };
-      setPreview(next);
-      setProcessing(false);
-    }, 2000);
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  }
+
+  function handleClose() {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    setSelectedCategory("");
+    setOpen(false);
   }
 
   function confirmAdd() {
-    if (!preview) return;
-    addGarment({ ...preview, id: `${preview.id}-${Date.now()}` });
-    toast.success(`${preview.name} added to your wardrobe`);
-    setOpen(false);
+    if (!previewUrl || !selectedCategory) return;
+    const categoryMap: Record<string, Category> = {
+      tops: "top",
+      bottoms: "bottom",
+      dresses_coats: "dress",
+      shoes: "shoes",
+      accessories: "accessory",
+    };
+    const cat = categoryMap[selectedCategory];
+    addGarment({
+      id: `u-${Date.now()}`,
+      name: "New Item",
+      category: cat,
+      color: "#C9A98E",
+    });
+    toast.success("Item added to your wardrobe");
+    handleClose();
   }
 
   return (
