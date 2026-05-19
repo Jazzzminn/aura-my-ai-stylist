@@ -88,10 +88,23 @@ export function AIStyleTab() {
     setInput("");
     setTyping(true);
 
+    console.log(
+      "Wardrobe state:",
+      wardrobe.map((g) => ({ id: g.id, name: g.name, category: g.category })),
+    );
+
     try {
       await new Promise((r) => setTimeout(r, 700));
       const key = matchAuraKey(t);
       const matched = auraResponses[key];
+      const wardrobeIds = new Set(wardrobe.map((g) => g.id));
+      const missing = matched.outfit.filter((id) => !wardrobeIds.has(id));
+      if (missing.length > 0) {
+        console.warn(
+          `[Aura] Outfit "${key}" references IDs not in wardrobe:`,
+          missing,
+        );
+      }
       const style: StyleResponse = {
         outfit: matched.outfit,
         headline: matched.headline,
