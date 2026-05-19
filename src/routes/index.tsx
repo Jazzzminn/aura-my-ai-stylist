@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import auraLogo from "@/assets/aura-logo.png";
 
 export const Route = createFileRoute("/")({
   component: Login,
@@ -21,12 +20,8 @@ function Login() {
     <main className="min-h-dvh bg-background">
       <div className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center px-8">
         <div className="flex w-full flex-col items-center">
-          <img
-            src={auraLogo}
-            alt="Aura — your digital closet, styled by AI"
-            className="w-56 max-w-full select-none"
-            draggable={false}
-          />
+          <h1 className="serif text-6xl tracking-tight text-foreground">Aura</h1>
+          <div className="mt-3 h-px w-12 bg-primary/60" />
           <p className="mt-4 text-center text-sm text-muted-foreground">
             Your wardrobe, multiplied.
           </p>
