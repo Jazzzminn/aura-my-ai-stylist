@@ -15,6 +15,9 @@ type AuraState = {
   addOutfit: (o: Outfit) => void;
   aiEnabled: boolean;
   setAiEnabled: (v: boolean) => void;
+  addItemOpen: boolean;
+  openAddItem: () => void;
+  closeAddItem: () => void;
 };
 
 const Ctx = createContext<AuraState | null>(null);
@@ -24,6 +27,7 @@ export function AuraProvider({ children, initialEmail }: { children: ReactNode; 
   const [wardrobe, setWardrobe] = useState<Garment[]>(INITIAL_WARDROBE);
   const [outfits, setOutfits] = useState<Outfit[]>(INITIAL_OUTFITS);
   const [aiEnabled, setAiEnabled] = useState(true);
+  const [addItemOpen, setAddItemOpen] = useState(false);
 
   const value = useMemo<AuraState>(
     () => ({
