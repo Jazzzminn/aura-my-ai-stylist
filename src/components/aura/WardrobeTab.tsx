@@ -39,7 +39,7 @@ export function WardrobeTab() {
           <div className="relative mt-2 flex h-56 flex-col items-center gap-2 overflow-hidden">
             <div className="absolute top-2 left-3 right-3 h-px bg-foreground/20" />
             {longs.slice(0, 2).map((g) => (
-              <HangingItem key={g.id} g={g} tall onRemove={removeGarment} />
+              <HangingItem key={g.id} g={g} tall onRemove={removeGarment} onRename={renameGarment} />
             ))}
           </div>
         </section>
