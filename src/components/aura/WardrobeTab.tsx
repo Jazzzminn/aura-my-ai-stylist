@@ -1,21 +1,27 @@
 import { useAura } from "@/components/aura/store";
 import { GarmentVisual } from "@/components/aura/Garment";
-import { MOCK_NEW_ITEMS } from "@/lib/aura";
+import type { Category } from "@/lib/aura";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Plus, ChevronDown, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Plus, ChevronDown, Upload } from "lucide-react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 
 export function WardrobeTab() {
