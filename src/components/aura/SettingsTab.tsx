@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
+import auraLogo from "@/assets/aura-logo.png";
 
 export function SettingsTab() {
   const { user, setUser, aiEnabled, setAiEnabled } = useAura();
