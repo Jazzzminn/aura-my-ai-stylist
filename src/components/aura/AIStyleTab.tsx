@@ -40,7 +40,7 @@ const auraResponses = {
     headline: "Serious, but make it yours",
     reasoning:
       "The blue stripe Oxford tucked into the black gingham skirt is an unexpected combination that works because the scale of the patterns don't compete. White sneakers keep it from going too formal.",
-    outfit: ["top_002", "bottom_006", "shoes_002", "acc_005"],
+    outfit: ["t1", "b2", "s2", "a2"],
   },
   party: {
     headline: "The one they remember",
