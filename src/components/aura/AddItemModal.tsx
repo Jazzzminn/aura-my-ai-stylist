@@ -108,6 +108,19 @@ export function AddItemModal() {
 
           <div className="space-y-1.5">
             <label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Name
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. White linen shirt"
+              className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
               Category
             </label>
             <Select
@@ -129,7 +142,7 @@ export function AddItemModal() {
 
           <Button
             onClick={confirmAdd}
-            disabled={!selectedFile || !selectedCategory}
+            disabled={!canSubmit}
             className="w-full rounded-full bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50"
           >
             Add Item
