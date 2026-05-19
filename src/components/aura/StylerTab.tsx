@@ -8,7 +8,7 @@ import { toast } from "sonner";
 type Slot = "top" | "bottom" | "shoes";
 
 export function StylerTab() {
-  const { wardrobe, addOutfit } = useAura();
+  const { wardrobe, addOutfit, openAddItem } = useAura();
   const tops = useMemo(() => wardrobe.filter((g) => g.category === "top"), [wardrobe]);
   const bottoms = useMemo(() => wardrobe.filter((g) => g.category === "bottom"), [wardrobe]);
   const shoes = useMemo(() => wardrobe.filter((g) => g.category === "shoes"), [wardrobe]);
