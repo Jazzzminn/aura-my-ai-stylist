@@ -1,12 +1,21 @@
 import { useState, useRef, useEffect } from "react";
 import { useAura } from "@/components/aura/store";
-import { AI_FLOWS } from "@/lib/aura";
 import { GarmentVisual } from "@/components/aura/Garment";
-import { Send } from "lucide-react";
+import { Send, ArrowRight } from "lucide-react";
+
+type StyleResponse = {
+  outfit: string[];
+  headline: string;
+  reasoning: string;
+  alternatives: { swap_out: string; swap_in: string; why: string }[];
+};
 
 type Msg =
-  | { id: string; role: "assistant" | "user"; text: string }
-  | { id: string; role: "assistant"; text: string; pickIds: string[] };
+  | { id: string; role: "user"; text: string }
+  | { id: string; role: "assistant"; text: string }
+  | { id: string; role: "assistant"; style: StyleResponse };
+
+const SUGGESTED = ["Brunch with friends", "First date", "Lazy Sunday"];
 
 export function AIStyleTab() {
   const { wardrobe, aiEnabled } = useAura();
@@ -21,27 +30,41 @@ export function AIStyleTab() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  function send(text: string) {
+  async function send(text: string) {
     const t = text.trim();
-    if (!t) return;
+    if (!t || typing) return;
     setMessages((m) => [...m, { id: `u-${Date.now()}`, role: "user", text: t }]);
     setInput("");
     setTyping(true);
-    setTimeout(() => {
-      const flow =
-        AI_FLOWS.find((f) => f.prompt.toLowerCase() === t.toLowerCase()) ??
-        AI_FLOWS[Math.floor(Math.random() * AI_FLOWS.length)];
+
+    try {
+      const res = await fetch("/api/ai-style", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          wardrobe,
+          style: "relaxed, warm neutrals, slightly oversized",
+          message: t,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Request failed");
+      setMessages((m) => [
+        ...m,
+        { id: `a-${Date.now()}`, role: "assistant", style: data as StyleResponse },
+      ]);
+    } catch (e) {
       setMessages((m) => [
         ...m,
         {
           id: `a-${Date.now()}`,
           role: "assistant",
-          text: flow.reply,
-          pickIds: flow.pickIds,
-        } as Msg,
+          text: `Sorry — I couldn't put that together right now. ${e instanceof Error ? e.message : ""}`,
+        },
       ]);
+    } finally {
       setTyping(false);
-    }, 1500);
+    }
   }
 
   if (!aiEnabled) {
@@ -73,31 +96,12 @@ export function AIStyleTab() {
               </div>
             );
           }
-          const pickIds = "pickIds" in m ? m.pickIds : undefined;
+          if ("style" in m) {
+            return <StyleCard key={m.id} style={m.style} wardrobe={wardrobe} />;
+          }
           return (
-            <div key={m.id} className="space-y-3">
-              <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-card px-4 py-3 text-sm text-foreground soft-shadow">
-                {m.text}
-              </div>
-              {pickIds && (
-                <div className="grid grid-cols-3 gap-2">
-                  {pickIds.map((id) => {
-                    const g = wardrobe.find((x) => x.id === id);
-                    if (!g) return null;
-                    return (
-                      <div
-                        key={id}
-                        className="flex flex-col items-center rounded-2xl bg-card p-3 soft-shadow"
-                      >
-                        <GarmentVisual garment={g} size="sm" />
-                        <span className="mt-1 text-[10px] text-muted-foreground truncate w-full text-center">
-                          {g.name}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+            <div key={m.id} className="max-w-[85%] rounded-2xl rounded-bl-md bg-card px-4 py-3 text-sm text-foreground soft-shadow">
+              {m.text}
             </div>
           );
         })}
@@ -111,15 +115,14 @@ export function AIStyleTab() {
         <div ref={endRef} />
       </div>
 
-      {/* Suggested prompts */}
       <div className="flex gap-2 overflow-x-auto px-5 pb-3">
-        {AI_FLOWS.map((f) => (
+        {SUGGESTED.map((p) => (
           <button
-            key={f.prompt}
-            onClick={() => send(f.prompt)}
+            key={p}
+            onClick={() => send(p)}
             className="shrink-0 rounded-full border border-border bg-card px-3 py-1.5 text-xs text-foreground hover:bg-secondary"
           >
-            {f.prompt}
+            {p}
           </button>
         ))}
       </div>
@@ -145,6 +148,64 @@ export function AIStyleTab() {
           <Send className="h-4 w-4" strokeWidth={1.75} />
         </button>
       </form>
+    </div>
+  );
+}
+
+function StyleCard({
+  style,
+  wardrobe,
+}: {
+  style: StyleResponse;
+  wardrobe: ReturnType<typeof useAura>["wardrobe"];
+}) {
+  const findItem = (id: string) => wardrobe.find((g) => g.id === id);
+  return (
+    <div className="space-y-3 rounded-2xl bg-card p-4 soft-shadow">
+      <h2 className="serif text-2xl text-foreground">{style.headline}</h2>
+
+      <div className="flex gap-3 overflow-x-auto pb-1">
+        {style.outfit.map((id) => {
+          const g = findItem(id);
+          if (!g) return null;
+          return (
+            <div key={id} className="flex w-24 shrink-0 flex-col items-center">
+              <GarmentVisual garment={g} size="md" />
+              <span className="mt-1 w-full truncate text-center text-[10px] text-muted-foreground">
+                {g.name}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="text-sm leading-relaxed text-foreground">{style.reasoning}</p>
+
+      {style.alternatives?.length > 0 && (
+        <div className="space-y-2 pt-1">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Or try</p>
+          {style.alternatives.map((alt, i) => {
+            const out = findItem(alt.swap_out);
+            const inn = findItem(alt.swap_in);
+            if (!out || !inn) return null;
+            return (
+              <div
+                key={i}
+                className="flex items-center gap-3 rounded-xl border border-border bg-background/60 p-2"
+              >
+                <div className="flex w-14 shrink-0 flex-col items-center">
+                  <GarmentVisual garment={out} size="sm" />
+                </div>
+                <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <div className="flex w-14 shrink-0 flex-col items-center">
+                  <GarmentVisual garment={inn} size="sm" />
+                </div>
+                <span className="flex-1 text-xs text-foreground">{alt.why}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
