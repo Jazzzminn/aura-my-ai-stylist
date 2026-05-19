@@ -19,7 +19,6 @@ const ACC_H = 240;
 export function WardrobeTab() {
   const { wardrobe, openAddItem, removeGarment, renameGarment } = useAura();
   const [drawer1Open, setDrawer1Open] = useState(true);
-  const [drawer2Open, setDrawer2Open] = useState(false);
 
   const tops = wardrobe.filter((g) => g.category === "top");
   const bottoms = wardrobe.filter((g) => g.category === "bottom");
