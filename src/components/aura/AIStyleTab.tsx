@@ -63,41 +63,44 @@ export function AIStyleTab() {
     setInput("");
     setTyping(true);
 
-    const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined;
+    const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY as string | undefined;
     const userMessage = `My wardrobe: ${JSON.stringify(wardrobe)}. My style: relaxed, warm neutrals, slightly oversized. Today's request: ${t}`;
 
     console.log(
-      "Calling OpenRouter with key:",
-      OPENROUTER_API_KEY ? OPENROUTER_API_KEY.slice(0, 8) + "..." : "undefined",
+      "Calling Google AI with key:",
+      API_KEY ? API_KEY.slice(0, 8) + "..." : "undefined",
     );
 
     try {
-      if (!OPENROUTER_API_KEY) {
+      if (!API_KEY) {
         throw new Error(
-          "VITE_OPENROUTER_API_KEY is undefined. Add it to .env as `VITE_OPENROUTER_API_KEY=sk-or-v1-...` (no quotes, no spaces) and restart the dev server.",
+          "VITE_GOOGLE_API_KEY is undefined. Add it to .env as `VITE_GOOGLE_API_KEY=...` (no quotes, no spaces) and restart the dev server.",
         );
       }
 
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-          "HTTP-Referer": window.location.origin,
-          "X-Title": "Aura",
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: AURA_SYSTEM_PROMPT }],
+            },
+            contents: [
+              { role: "user", parts: [{ text: userMessage }] },
+            ],
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 1000,
+            },
+          }),
         },
-        body: JSON.stringify({
-          model: "anthropic/claude-sonnet-4",
-          messages: [
-            { role: "system", content: AURA_SYSTEM_PROMPT },
-            { role: "user", content: userMessage },
-          ],
-        }),
-      });
+      );
 
       if (!response.ok) {
         const bodyText = await response.text();
-        console.error("OpenRouter API call failed:", {
+        console.error("Google AI API call failed:", {
           status: response.status,
           statusText: response.statusText,
           body: bodyText,
@@ -112,7 +115,7 @@ export function AIStyleTab() {
       }
 
       const data = await response.json();
-      const raw: string = data.choices[0].message.content;
+      const raw: string = data.candidates[0].content.parts[0].text;
 
       const match = raw.match(/\{[\s\S]*\}/);
       const parsed = JSON.parse(match ? match[0] : raw) as StyleResponse;
