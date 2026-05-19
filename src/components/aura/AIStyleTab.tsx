@@ -134,6 +134,7 @@ export function AIStyleTab() {
 
     try {
       const result = await getAuraOutfit(
+        callAura,
         t,
         wardrobe.map((g) => ({
           id: g.id,
