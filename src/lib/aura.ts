@@ -72,8 +72,4 @@ export const AI_FLOWS: AIFlow[] = [
   },
 ];
 
-export const INITIAL_OUTFITS: Outfit[] = [
-  { id: "o1", name: "Sunday Soft", topId: "t1", bottomId: "b2", shoesId: "s2" },
-  { id: "o2", name: "City Walk", topId: "t2", bottomId: "b1", shoesId: "s1" },
-  { id: "o3", name: "Late Dinner", topId: "t3", bottomId: "b3", shoesId: "s3" },
-];
+export const INITIAL_OUTFITS: Outfit[] = [];
