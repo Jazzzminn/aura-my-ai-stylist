@@ -52,7 +52,7 @@ const auraResponses = {
     headline: "Today's pick",
     reasoning:
       "The white fitted tee and olive wide-legs is the cleanest combination in your wardrobe right now. Easy, adaptable, works for almost anything you've got going on today.",
-    outfit: ["top_003", "bottom_001", "shoes_001", "acc_007"],
+    outfit: ["t1", "b1", "s2", "a1"],
   },
 };
 
