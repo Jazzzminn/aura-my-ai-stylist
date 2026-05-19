@@ -162,22 +162,26 @@ export function AIStyleTab() {
     );
 
     try {
-      await new Promise((r) => setTimeout(r, 700));
-      const key = matchAuraKey(t);
-      const matched = auraResponses[key];
+      const result = await getAuraOutfit(
+        t,
+        wardrobe.map((g) => ({
+          id: g.id,
+          name: g.name,
+          category: g.category,
+          color: g.color,
+        })),
+      );
       const wardrobeIds = new Set(wardrobe.map((g) => g.id));
-      const missing = matched.outfit.filter((id) => !wardrobeIds.has(id));
+      const missing = result.outfit.filter((id) => !wardrobeIds.has(id));
       if (missing.length > 0) {
-        console.warn(
-          `[Aura] Outfit "${key}" references IDs not in wardrobe:`,
-          missing,
-        );
+        console.warn(`[Aura] Outfit references IDs not in wardrobe:`, missing);
       }
       const style: StyleResponse = {
-        outfit: matched.outfit,
-        headline: matched.headline,
-        reasoning: matched.reasoning,
-        alternatives: [],
+        outfit: result.outfit,
+        headline: result.headline,
+        reasoning: result.reasoning,
+        alternatives: result.alternatives ?? [],
+        source: result.source,
       };
       setMessages((m) => [
         ...m,
@@ -185,13 +189,20 @@ export function AIStyleTab() {
       ]);
     } catch (err) {
       console.error("Error:", err);
-      const msg = err instanceof Error ? err.message : String(err);
+      const key = matchAuraKey(t);
+      const r = auraResponses[key];
       setMessages((m) => [
         ...m,
         {
           id: `a-${Date.now()}`,
           role: "assistant",
-          text: `Aura is offline — ${msg}`,
+          style: {
+            outfit: r.outfit,
+            headline: r.headline,
+            reasoning: r.reasoning,
+            alternatives: [],
+            source: "fallback",
+          },
         },
       ]);
     } finally {
