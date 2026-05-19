@@ -226,7 +226,7 @@ function GarmentLayer({
 }) {
   return (
     <div
-      className="pointer-events-none absolute left-1/2 -translate-x-1/2 w-[78%] flex items-center justify-center"
+      className="pointer-events-none absolute left-1/2 -translate-x-1/2 flex items-center justify-center"
       style={style}
     >
       {empty ? (
