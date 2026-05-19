@@ -39,8 +39,11 @@ export function AuraProvider({ children, initialEmail }: { children: ReactNode; 
       addOutfit: (o) => setOutfits((arr) => [o, ...arr]),
       aiEnabled,
       setAiEnabled,
+      addItemOpen,
+      openAddItem: () => setAddItemOpen(true),
+      closeAddItem: () => setAddItemOpen(false),
     }),
-    [user, wardrobe, outfits, aiEnabled],
+    [user, wardrobe, outfits, aiEnabled, addItemOpen],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
