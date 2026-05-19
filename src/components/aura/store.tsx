@@ -27,6 +27,7 @@ type AuraState = {
   wardrobe: Garment[];
   addGarment: (g: Garment) => void;
   removeGarment: (id: string) => void;
+  renameGarment: (id: string, name: string) => void;
   outfits: Outfit[];
   addOutfit: (o: Outfit) => void;
   aiEnabled: boolean;
