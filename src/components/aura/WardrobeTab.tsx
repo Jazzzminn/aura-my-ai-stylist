@@ -73,12 +73,15 @@ export function WardrobeTab() {
             {acc.map((g) => (
               <div key={g.id} className="flex flex-col items-center">
                 <div className="relative aspect-square w-full rounded-xl bg-secondary/50 p-2">
-                  <GarmentVisual garment={g} size="sm" className="!h-full !w-full" />
+                  <GarmentVisual
+                    garment={g}
+                    size="sm"
+                    className="!h-full !w-full"
+                    editableName
+                    onRename={(n) => renameGarment(g.id, n)}
+                  />
                   <DeleteBadge onClick={() => removeGarment(g.id)} />
                 </div>
-                <span className="mt-1 text-[10px] text-muted-foreground truncate w-full text-center">
-                  {g.name}
-                </span>
               </div>
             ))}
           </div>
