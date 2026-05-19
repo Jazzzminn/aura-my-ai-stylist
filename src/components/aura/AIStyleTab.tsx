@@ -63,29 +63,47 @@ export function AIStyleTab() {
     setInput("");
     setTyping(true);
 
+    const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined;
+    const userMessage = `My wardrobe: ${JSON.stringify(wardrobe)}. My style: relaxed, warm neutrals, slightly oversized. Today's request: ${t}`;
+
     try {
-      const res = await fetch("/api/ai-style", {
+      if (!OPENROUTER_API_KEY) throw new Error("Missing VITE_OPENROUTER_API_KEY");
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "Aura",
+        },
         body: JSON.stringify({
-          wardrobe,
-          style: "relaxed, warm neutrals, slightly oversized",
-          message: t,
+          model: "anthropic/claude-sonnet-4",
+          messages: [
+            { role: "system", content: AURA_SYSTEM_PROMPT },
+            { role: "user", content: userMessage },
+          ],
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Request failed");
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error?.message ?? `HTTP ${response.status}`);
+      const raw: string = data.choices[0].message.content;
+
+      const match = raw.match(/\{[\s\S]*\}/);
+      const parsed = JSON.parse(match ? match[0] : raw) as StyleResponse;
+
       setMessages((m) => [
         ...m,
-        { id: `a-${Date.now()}`, role: "assistant", style: data as StyleResponse },
+        { id: `a-${Date.now()}`, role: "assistant", style: parsed },
       ]);
-    } catch (e) {
+    } catch {
       setMessages((m) => [
         ...m,
         {
           id: `a-${Date.now()}`,
           role: "assistant",
-          text: `Sorry — I couldn't put that together right now. ${e instanceof Error ? e.message : ""}`,
+          text: "Aura is offline right now — try again in a sec",
         },
       ]);
     } finally {
