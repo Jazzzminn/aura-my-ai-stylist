@@ -24,38 +24,38 @@ const auraResponses = {
   brunch: {
     headline: "Soft morning, strong outfit",
     reasoning:
-      "The cream wide-legs and white Oxford keep it relaxed but pulled-together — nothing too try-hard for a Sunday table. Add the gold hoops and the brown suede bag to lift it without overthinking it.",
-    outfit: ["t3", "b1", "s2", "a2", "a1"],
+      "The blue satin with the flared jeans is an easy combination that feels considered without trying too hard. The brown shoes ground the whole thing with some warmth.",
+    outfit: ["u-1779179889694", "u-1779179932624", "u-1779179197165"],
   },
   date: {
     headline: "Understated, on purpose",
     reasoning:
-      "The black crewneck over the olive trousers is the kind of outfit that looks like you didn't try, which is exactly the point. The brown Chelsea boots ground it. Keep jewellery minimal — just the silver chain.",
-    outfit: ["t2", "b3", "s1", "a2"],
+      "The maroon lace top over the fairy green skirt is an unexpected colour combination that works because both pieces are delicate in texture. Add the brown shoes to keep it grounded.",
+    outfit: ["u-1779181156477", "u-1779180854608", "u-1779179197165"],
   },
   sunday: {
     headline: "Nowhere to be",
     reasoning:
-      "Black shorts, the Paris tee, and your Sambas. Comfortable but not sloppy — the Sambas do the heavy lifting here. Grab the LA cap if you're stepping outside.",
-    outfit: ["t4", "b4", "s2", "a3"],
+      "The brown top and flared jeans is the most relaxed pairing in your wardrobe right now. Easy, comfortable, zero effort required.",
+    outfit: ["u-1779182038860", "u-1779179932624", "u-1779179197165"],
   },
   work: {
     headline: "Serious, but make it yours",
     reasoning:
-      "The blue stripe Oxford tucked into the black gingham skirt is an unexpected combination that works because the scale of the patterns don't compete. White sneakers keep it from going too formal.",
-    outfit: ["t1", "b2", "s2", "a2"],
+      "The striped punk top tucked into the fairy green skirt creates an interesting contrast between edge and softness. The brown shoes pull it into daytime territory.",
+    outfit: ["u-1779179906139", "u-1779180854608", "u-1779179197165"],
   },
   party: {
     headline: "The one they remember",
     reasoning:
-      "Royal blue sweatshirt, cream cargo trousers, and the blue Spezials — monochromatic without being matchy. The yellow crescent bag is the whole personality of this outfit.",
-    outfit: ["t2", "b3", "s3", "a1"],
+      "The two piece on its own is the whole outfit. Nothing else needed — just the brown shoes to finish it off.",
+    outfit: ["u-1779179673248", "u-1779179197165"],
   },
   default: {
     headline: "Today's pick",
     reasoning:
-      "The white fitted tee and olive wide-legs is the cleanest combination in your wardrobe right now. Easy, adaptable, works for almost anything you've got going on today.",
-    outfit: ["t1", "b1", "s2", "a1"],
+      "The blue satin top with the flared jeans is the cleanest combination in your wardrobe right now. Works for almost anything you have going on today.",
+    outfit: ["u-1779179889694", "u-1779179932624", "u-1779179197165"],
   },
 };
 
