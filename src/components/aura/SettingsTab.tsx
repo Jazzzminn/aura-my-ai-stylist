@@ -4,11 +4,17 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 
 export function SettingsTab() {
   const { user, setUser, aiEnabled, setAiEnabled } = useAura();
   const navigate = useNavigate();
+
+  async function logout() {
+    await supabase.auth.signOut();
+    navigate({ to: "/" });
+  }
 
   return (
     <div className="pb-28">
@@ -61,7 +67,7 @@ export function SettingsTab() {
 
       <div className="mt-16 flex justify-center px-5">
         <button
-          onClick={() => navigate({ to: "/" })}
+          onClick={logout}
           className="text-xs uppercase tracking-[0.25em] text-muted-foreground hover:text-foreground"
         >
           Log out

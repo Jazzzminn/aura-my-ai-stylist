@@ -1,19 +1,69 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { ensureTestAccount } from "@/lib/seed.functions";
 
 export const Route = createFileRoute("/")({
   component: Login,
 });
 
+type Mode = "signin" | "signup";
+
 function Login() {
   const navigate = useNavigate();
+  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const seed = useServerFn(ensureTestAccount);
 
-  function submit(e: React.FormEvent) {
+  // If a session already exists, jump straight to the app.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        navigate({
+          to: "/app",
+          search: { email: data.session.user.email ?? "" },
+        });
+      }
+    });
+  }, [navigate]);
+
+  // Seed the demo test@test.com account on first visit (idempotent).
+  useEffect(() => {
+    seed().catch((err) => console.warn("seed failed", err));
+  }, [seed]);
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = email.trim() || "you@aura.style";
-    navigate({ to: "/app", search: { email: trimmed } });
+    const trimmed = email.trim();
+    if (!trimmed || !password) return;
+    setBusy(true);
+    try {
+      const fn =
+        mode === "signup"
+          ? supabase.auth.signUp({
+              email: trimmed,
+              password,
+              options: { emailRedirectTo: window.location.origin },
+            })
+          : supabase.auth.signInWithPassword({ email: trimmed, password });
+      const { data, error } = await fn;
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      if (!data.session) {
+        toast.success("Check your email to confirm your account.");
+        return;
+      }
+      navigate({ to: "/app", search: { email: trimmed } });
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -45,16 +95,44 @@ function Login() {
               className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
           </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="password"
+              className="block text-[10px] uppercase tracking-[0.25em] text-muted-foreground"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+          </div>
           <Button
             type="submit"
-            className="w-full rounded-full bg-primary py-6 text-base text-primary-foreground hover:opacity-90"
+            disabled={busy}
+            className="w-full rounded-full bg-primary py-6 text-base text-primary-foreground hover:opacity-90 disabled:opacity-60"
           >
-            Continue
+            {busy ? "Please wait…" : mode === "signup" ? "Create account" : "Sign in"}
           </Button>
+          <button
+            type="button"
+            onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
+            className="block w-full text-center text-xs text-muted-foreground underline-offset-4 hover:underline"
+          >
+            {mode === "signup"
+              ? "Already have an account? Sign in"
+              : "New here? Create an account"}
+          </button>
         </form>
 
-        <p className="mt-10 text-center text-[11px] text-muted-foreground">
-          By continuing you agree to our calm, opt-in approach to styling.
+        <p className="mt-8 text-center text-[11px] text-muted-foreground">
+          Try the demo: <span className="font-mono">test@test.com</span> /{" "}
+          <span className="font-mono">test1234</span>
         </p>
       </div>
     </main>
