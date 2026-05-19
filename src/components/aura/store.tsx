@@ -27,6 +27,7 @@ type AuraState = {
   wardrobe: Garment[];
   addGarment: (g: Garment) => void;
   removeGarment: (id: string) => void;
+  renameGarment: (id: string, name: string) => void;
   outfits: Outfit[];
   addOutfit: (o: Outfit) => void;
   aiEnabled: boolean;
@@ -60,6 +61,8 @@ export function AuraProvider({ children, initialEmail }: { children: ReactNode; 
       wardrobe,
       addGarment: (g) => setWardrobe((w) => [...w, g]),
       removeGarment: (id) => setWardrobe((w) => w.filter((g) => g.id !== id)),
+      renameGarment: (id, name) =>
+        setWardrobe((w) => w.map((g) => (g.id === id ? { ...g, name } : g))),
       outfits,
       addOutfit: (o) => setOutfits((arr) => [o, ...arr]),
       aiEnabled,
