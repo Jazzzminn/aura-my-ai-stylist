@@ -76,17 +76,38 @@ export function OutfitsTab() {
         })}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o);
+          if (!o) setPhoto(null);
+        }}
+      >
         <DialogContent className="bg-card sm:max-w-sm rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-2xl">Post your OOTD</DialogTitle>
             <DialogDescription>Share today's look with your circle.</DialogDescription>
           </DialogHeader>
-          <div className="grid h-40 place-items-center rounded-xl border border-dashed border-border bg-secondary/40 text-xs text-muted-foreground">
-            Tap to add a photo
-          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFile}
+          />
+          <button
+            type="button"
+            onClick={handlePick}
+            className="relative grid h-40 w-full place-items-center overflow-hidden rounded-xl border border-dashed border-border bg-secondary/40 text-xs text-muted-foreground hover:bg-secondary/60"
+          >
+            {photo ? (
+              <img src={photo} alt="OOTD preview" className="h-full w-full object-cover" />
+            ) : (
+              "Tap to add a photo"
+            )}
+          </button>
           <Button
-            onClick={fake}
+            onClick={post}
             className="rounded-full bg-primary text-primary-foreground"
           >
             Post
