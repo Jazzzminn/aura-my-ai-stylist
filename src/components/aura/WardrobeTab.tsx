@@ -78,13 +78,12 @@ export function WardrobeTab() {
         <section className="rounded-2xl bg-card p-4 soft-shadow">
           <RailLabel>Accessories &amp; shoes</RailLabel>
           <div className="relative mt-3 overflow-x-auto wardrobe-scroll" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
-            <div className="grid grid-flow-col gap-3" style={{ gridAutoColumns: "minmax(120px, 140px)" }}>
+            <div className="grid grid-flow-col gap-3" style={{ gridAutoColumns: "minmax(160px, 160px)" }}>
               {acc.map((g) => (
                 <div key={g.id} className="flex flex-col items-center">
-                  <div className="relative aspect-square w-full rounded-xl bg-secondary/50 p-2">
+                  <div className="relative h-[200px] w-full">
                     <GarmentVisual
                       garment={g}
-                      size="sm"
                       className="!h-full !w-full"
                       editableName
                       onRename={(n) => renameGarment(g.id, n)}
