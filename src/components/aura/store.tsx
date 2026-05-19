@@ -21,6 +21,8 @@ function loadWardrobe(): Garment[] {
   }
 }
 
+export type Post = { id: string; name: string; photoUrl: string };
+
 type AuraState = {
   user: { name: string; email: string };
   setUser: (u: { name: string; email: string }) => void;
@@ -30,6 +32,10 @@ type AuraState = {
   renameGarment: (id: string, name: string) => void;
   outfits: Outfit[];
   addOutfit: (o: Outfit) => void;
+  posts: Post[];
+  addPost: (p: Post) => void;
+  renamePost: (id: string, name: string) => void;
+  removePost: (id: string) => void;
   aiEnabled: boolean;
   setAiEnabled: (v: boolean) => void;
   addItemOpen: boolean;
@@ -45,6 +51,7 @@ export function AuraProvider({ children, initialEmail }: { children: ReactNode; 
   const [outfits, setOutfits] = useState<Outfit[]>(INITIAL_OUTFITS);
   const [aiEnabled, setAiEnabled] = useState(true);
   const [addItemOpen, setAddItemOpen] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     try {
@@ -65,13 +72,18 @@ export function AuraProvider({ children, initialEmail }: { children: ReactNode; 
         setWardrobe((w) => w.map((g) => (g.id === id ? { ...g, name } : g))),
       outfits,
       addOutfit: (o) => setOutfits((arr) => [o, ...arr]),
+      posts,
+      addPost: (p) => setPosts((arr) => [p, ...arr]),
+      renamePost: (id, name) =>
+        setPosts((arr) => arr.map((p) => (p.id === id ? { ...p, name } : p))),
+      removePost: (id) => setPosts((arr) => arr.filter((p) => p.id !== id)),
       aiEnabled,
       setAiEnabled,
       addItemOpen,
       openAddItem: () => setAddItemOpen(true),
       closeAddItem: () => setAddItemOpen(false),
     }),
-    [user, wardrobe, outfits, aiEnabled, addItemOpen],
+    [user, wardrobe, outfits, posts, aiEnabled, addItemOpen],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
