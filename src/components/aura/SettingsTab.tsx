@@ -67,7 +67,7 @@ export function SettingsTab() {
 
       <div className="mt-16 flex justify-center px-5">
         <button
-          onClick={() => navigate({ to: "/" })}
+          onClick={logout}
           className="text-xs uppercase tracking-[0.25em] text-muted-foreground hover:text-foreground"
         >
           Log out
