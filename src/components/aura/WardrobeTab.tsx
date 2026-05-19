@@ -224,7 +224,7 @@ function Drawer({
       <CollapsibleContent>
         <div className="relative px-4 pb-4">
           <div
-            className="overflow-x-auto wardrobe-scroll"
+            className="overflow-x-auto wardrobe-scroll pt-2 -mt-2"
             style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
           >
             <div className="flex gap-3">
