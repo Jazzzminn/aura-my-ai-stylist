@@ -237,8 +237,9 @@ function FixedSlot({
           src={garment.imageUrl}
           alt={garment.name}
           style={{
-            height,
-            width,
+            width: "100%",
+            height: "auto",
+            maxHeight: height,
             objectFit: "contain",
             display: "block",
             margin: "0 auto",
