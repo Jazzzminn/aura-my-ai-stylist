@@ -22,7 +22,7 @@ const auraResponses = {
     headline: "Soft morning, strong outfit",
     reasoning:
       "The cream wide-legs and white Oxford keep it relaxed but pulled-together — nothing too try-hard for a Sunday table. Add the gold hoops and the brown suede bag to lift it without overthinking it.",
-    outfit: ["top_008", "bottom_002", "shoes_002", "acc_007", "acc_002"],
+    outfit: ["t3", "b1", "s2", "a2", "a1"],
   },
   date: {
     headline: "Understated, on purpose",
