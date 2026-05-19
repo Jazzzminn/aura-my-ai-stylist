@@ -46,7 +46,7 @@ const auraResponses = {
     headline: "The one they remember",
     reasoning:
       "Royal blue sweatshirt, cream cargo trousers, and the blue Spezials — monochromatic without being matchy. The yellow crescent bag is the whole personality of this outfit.",
-    outfit: ["top_007", "bottom_005", "shoes_005", "acc_003"],
+    outfit: ["t2", "b3", "s3", "a1"],
   },
   default: {
     headline: "Today's pick",
