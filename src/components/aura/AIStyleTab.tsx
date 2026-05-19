@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { useAura } from "@/components/aura/store";
 import { GarmentVisual } from "@/components/aura/Garment";
 import { Send, ArrowRight } from "lucide-react";
+import { generateAuraOutfit } from "@/lib/aura.functions";
 
 type StyleResponse = {
   outfit: string[];
