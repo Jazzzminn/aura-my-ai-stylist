@@ -1,0 +1,49 @@
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  INITIAL_OUTFITS,
+  INITIAL_WARDROBE,
+  type Garment,
+  type Outfit,
+} from "@/lib/aura";
+
+type AuraState = {
+  user: { name: string; email: string };
+  setUser: (u: { name: string; email: string }) => void;
+  wardrobe: Garment[];
+  addGarment: (g: Garment) => void;
+  outfits: Outfit[];
+  addOutfit: (o: Outfit) => void;
+  aiEnabled: boolean;
+  setAiEnabled: (v: boolean) => void;
+};
+
+const Ctx = createContext<AuraState | null>(null);
+
+export function AuraProvider({ children, initialEmail }: { children: ReactNode; initialEmail?: string }) {
+  const [user, setUser] = useState({ name: "You", email: initialEmail ?? "" });
+  const [wardrobe, setWardrobe] = useState<Garment[]>(INITIAL_WARDROBE);
+  const [outfits, setOutfits] = useState<Outfit[]>(INITIAL_OUTFITS);
+  const [aiEnabled, setAiEnabled] = useState(true);
+
+  const value = useMemo<AuraState>(
+    () => ({
+      user,
+      setUser,
+      wardrobe,
+      addGarment: (g) => setWardrobe((w) => [...w, g]),
+      outfits,
+      addOutfit: (o) => setOutfits((arr) => [o, ...arr]),
+      aiEnabled,
+      setAiEnabled,
+    }),
+    [user, wardrobe, outfits, aiEnabled],
+  );
+
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+export function useAura() {
+  const ctx = useContext(Ctx);
+  if (!ctx) throw new Error("useAura must be inside AuraProvider");
+  return ctx;
+}
