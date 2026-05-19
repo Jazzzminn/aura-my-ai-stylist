@@ -8,6 +8,7 @@ type StyleResponse = {
   headline: string;
   reasoning: string;
   alternatives: { swap_out: string; swap_in: string; why: string }[];
+  source?: "ai" | "fallback";
 };
 
 type Msg =
