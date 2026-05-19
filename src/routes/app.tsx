@@ -26,7 +26,7 @@ function AppShell() {
   return (
     <AuraProvider initialEmail={email}>
       <div className="min-h-dvh bg-background">
-        <div className="mx-auto max-w-md">
+        <div className="mx-auto w-full max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-6xl px-0 sm:px-4 md:px-6 lg:px-8">
           {tab === "wardrobe" && <WardrobeTab />}
           {tab === "styler" && <StylerTab />}
           {tab === "ai" && <AIStyleTab />}
