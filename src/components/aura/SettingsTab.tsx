@@ -4,11 +4,17 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 
 export function SettingsTab() {
   const { user, setUser, aiEnabled, setAiEnabled } = useAura();
   const navigate = useNavigate();
+
+  async function logout() {
+    await supabase.auth.signOut();
+    navigate({ to: "/" });
+  }
 
   return (
     <div className="pb-28">
