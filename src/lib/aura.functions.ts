@@ -62,7 +62,9 @@ export const generateAuraOutfit = createServerFn({ method: "POST" })
             ],
             generationConfig: {
               temperature: data.temperature ?? 0.8,
-              maxOutputTokens: 1000,
+              maxOutputTokens: 2048,
+              responseMimeType: "application/json",
+              thinkingConfig: { thinkingBudget: 0 },
             },
           }),
         },
