@@ -127,11 +127,11 @@ function Mannequin({
   onAdd: () => void;
 }) {
   return (
-    <div className="relative mx-auto aspect-[3/5] w-full max-w-xs">
-      {/* silhouette — subtle ghost underlay, scaled to 55% and faded */}
+    <div className="relative mx-auto w-full max-w-xs">
+      {/* silhouette — subtle ghost underlay */}
       <svg
         viewBox="0 0 100 170"
-        className="absolute inset-0 h-full w-full"
+        className="pointer-events-none absolute inset-0 h-full w-full"
         style={{ opacity: 0.15, transform: "scale(0.55)", transformOrigin: "center center" }}
         aria-hidden
       >
@@ -150,101 +150,148 @@ function Mannequin({
         <path d="M72 30 L76 70 L71 70 L67 32 Z" fill="url(#mannequin)" />
       </svg>
 
-      {/* Garments layered on a single transparent canvas */}
-      {/* Shoes — back layer */}
-      <GarmentLayer
-        garment={shoe}
-        empty={shoesEmpty}
-        onAdd={onAdd}
-        compact
-        style={{ top: "78%", height: "20%", width: "50%", zIndex: 1 }}
-      />
-      {/* Bottom — middle layer */}
-      <GarmentLayer
-        garment={bottom}
-        empty={bottomsEmpty}
-        onAdd={onAdd}
-        style={{ top: "36%", height: "40%", width: "70%", zIndex: 2 }}
-      />
-      {/* Top — front layer, overlaps bottom at waist */}
-      <GarmentLayer
-        garment={top}
-        empty={topsEmpty}
-        onAdd={onAdd}
-        style={{
-          top: "6%",
-          height: "40%",
-          width: "70%",
-          zIndex: 3,
-          filter: "drop-shadow(0 6px 10px rgba(45,42,38,0.18))",
-        }}
-      />
-
-
-
-      {/* Swipe gesture zones (invisible) */}
-      <SwipeZone
-        className="absolute inset-x-0 z-20"
-        style={{ top: "8%", height: "30%" }}
-        onSwipe={(d) => onSwipe("top", d)}
-      />
-      <SwipeZone
-        className="absolute inset-x-0 z-10"
-        style={{ top: "40%", height: "35%" }}
-        onSwipe={(d) => onSwipe("bottom", d)}
-      />
-      <SwipeZone
-        className="absolute inset-x-0 z-0"
-        style={{ top: "75%", height: "25%" }}
-        onSwipe={(d) => onSwipe("shoes", d)}
-      />
-
-      {/* Floating arrows on the canvas sides */}
-      {!topsEmpty && <Arrows top="20%" onPrev={() => onSwipe("top", -1)} onNext={() => onSwipe("top", 1)} label="top" />}
-      {!bottomsEmpty && (
-        <Arrows top="57%" onPrev={() => onSwipe("bottom", -1)} onNext={() => onSwipe("bottom", 1)} label="bottom" />
-      )}
-      {!shoesEmpty && (
-        <Arrows top="82%" onPrev={() => onSwipe("shoes", -1)} onNext={() => onSwipe("shoes", 1)} label="shoes" />
-      )}
+      {/* Garment stack — fixed pixel sizes, zero gap */}
+      <div className="relative z-10 flex flex-col items-center" style={{ gap: 0 }}>
+        <FixedSlot
+          slot="top"
+          garment={top}
+          empty={topsEmpty}
+          onAdd={onAdd}
+          onSwipe={onSwipe}
+          width={220}
+          height={220}
+          placeholderLabel="Add a top"
+        />
+        <FixedSlot
+          slot="bottom"
+          garment={bottom}
+          empty={bottomsEmpty}
+          onAdd={onAdd}
+          onSwipe={onSwipe}
+          width={220}
+          height={220}
+          placeholderLabel="Add a bottom"
+        />
+        <FixedSlot
+          slot="shoes"
+          garment={shoe}
+          empty={shoesEmpty}
+          onAdd={onAdd}
+          onSwipe={onSwipe}
+          width={200}
+          height={130}
+          placeholderWidth={130}
+          placeholderHeight={100}
+          placeholderLabel="Add shoes"
+        />
+      </div>
     </div>
   );
 }
 
-function GarmentLayer({
+function FixedSlot({
+  slot,
   garment,
   empty,
   onAdd,
-  compact,
-  style,
+  onSwipe,
+  width,
+  height,
+  placeholderWidth,
+  placeholderHeight,
+  placeholderLabel,
 }: {
+  slot: Slot;
   garment?: Garment;
   empty: boolean;
   onAdd: () => void;
-  compact?: boolean;
-  style: React.CSSProperties;
+  onSwipe: (slot: Slot, dir: 1 | -1) => void;
+  width: number;
+  height: number;
+  placeholderWidth?: number;
+  placeholderHeight?: number;
+  placeholderLabel: string;
 }) {
+  const startX = useRef<number | null>(null);
+  const hasGarment = !empty && !!garment;
+
+  function onPointerDown(e: React.PointerEvent) {
+    startX.current = e.clientX;
+  }
+  function onPointerUp(e: React.PointerEvent) {
+    if (startX.current == null) return;
+    const dx = e.clientX - startX.current;
+    if (Math.abs(dx) > 30) onSwipe(slot, dx > 0 ? -1 : 1);
+    startX.current = null;
+  }
+
   return (
     <div
-      className="pointer-events-none absolute left-1/2 -translate-x-1/2 flex items-center justify-center"
-      style={style}
+      className="relative flex items-center justify-center"
+      style={{ width, height }}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
     >
-      {empty ? (
-        <div className="pointer-events-auto h-full w-full">
-          <EmptySlot onAdd={onAdd} compact={compact} />
-        </div>
-      ) : garment?.imageUrl ? (
+      {hasGarment && garment?.imageUrl ? (
         <img
           src={garment.imageUrl}
           alt={garment.name}
-          className="h-full w-full object-contain"
+          style={{
+            height,
+            width,
+            objectFit: "contain",
+            display: "block",
+            margin: "0 auto",
+          }}
         />
-      ) : garment ? (
-        <GarmentVisual garment={garment} className="!h-full !w-full bg-transparent" />
-      ) : null}
+      ) : hasGarment ? (
+        <GarmentVisual
+          garment={garment!}
+          className="bg-transparent"
+        />
+      ) : (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAdd();
+          }}
+          className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-border bg-card/40 px-2 text-center hover:bg-card/70"
+          style={{
+            width: placeholderWidth ?? Math.min(width, 160),
+            height: placeholderHeight ?? Math.min(height, 140),
+          }}
+        >
+          <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground">
+            <Plus className="h-4 w-4" strokeWidth={1.75} />
+          </span>
+          <span className="text-[11px] leading-tight text-muted-foreground">
+            {placeholderLabel}
+          </span>
+        </button>
+      )}
+
+      {hasGarment && (
+        <>
+          <button
+            onClick={() => onSwipe(slot, -1)}
+            aria-label={`Previous ${slot}`}
+            className="absolute left-[-12px] top-1/2 z-30 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-70 hover:opacity-100"
+          >
+            <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+          <button
+            onClick={() => onSwipe(slot, 1)}
+            aria-label={`Next ${slot}`}
+            className="absolute right-[-12px] top-1/2 z-30 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-70 hover:opacity-100"
+          >
+            <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
+          </button>
+        </>
+      )}
     </div>
   );
 }
+
 
 function Arrows({
   top,
