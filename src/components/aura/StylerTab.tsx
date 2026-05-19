@@ -159,8 +159,8 @@ function Mannequin({
           empty={topsEmpty}
           onAdd={onAdd}
           onSwipe={onSwipe}
-          width={260}
-          height={240}
+          width={220}
+          height={200}
           placeholderLabel="Add a top"
         />
         <FixedSlot
@@ -169,8 +169,8 @@ function Mannequin({
           empty={bottomsEmpty}
           onAdd={onAdd}
           onSwipe={onSwipe}
-          width={260}
-          height={260}
+          width={200}
+          height={240}
           placeholderLabel="Add a bottom"
         />
         <FixedSlot
@@ -179,10 +179,10 @@ function Mannequin({
           empty={shoesEmpty}
           onAdd={onAdd}
           onSwipe={onSwipe}
-          width={180}
-          height={100}
-          placeholderWidth={150}
-          placeholderHeight={90}
+          width={160}
+          height={90}
+          placeholderWidth={140}
+          placeholderHeight={80}
           placeholderLabel="Add shoes"
         />
       </div>
