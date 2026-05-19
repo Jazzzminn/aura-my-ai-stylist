@@ -168,8 +168,8 @@ function Mannequin({
           empty={bottomsEmpty}
           onAdd={onAdd}
           onSwipe={onSwipe}
-          width={200}
-          height={260}
+          width={260}
+          height={340}
           placeholderLabel="Add a bottom"
         />
         <FixedSlot
