@@ -131,8 +131,9 @@ function Mannequin({
       {/* silhouette — subtle ghost underlay */}
       <svg
         viewBox="0 0 100 170"
-        className="pointer-events-none absolute inset-0 h-full w-full"
-        style={{ opacity: 0.15, transform: "scale(0.55)", transformOrigin: "center center" }}
+        preserveAspectRatio="xMidYMin meet"
+        className="pointer-events-none absolute inset-x-0 top-0 h-full w-full"
+        style={{ opacity: 0.18, transform: "scale(0.9)", transformOrigin: "center top" }}
         aria-hidden
       >
         <defs>
