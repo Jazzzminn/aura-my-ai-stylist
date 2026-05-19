@@ -66,8 +66,17 @@ export function AIStyleTab() {
     const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined;
     const userMessage = `My wardrobe: ${JSON.stringify(wardrobe)}. My style: relaxed, warm neutrals, slightly oversized. Today's request: ${t}`;
 
+    console.log(
+      "Calling OpenRouter with key:",
+      OPENROUTER_API_KEY ? OPENROUTER_API_KEY.slice(0, 8) + "..." : "undefined",
+    );
+
     try {
-      if (!OPENROUTER_API_KEY) throw new Error("Missing VITE_OPENROUTER_API_KEY");
+      if (!OPENROUTER_API_KEY) {
+        throw new Error(
+          "VITE_OPENROUTER_API_KEY is undefined. Add it to .env as `VITE_OPENROUTER_API_KEY=sk-or-v1-...` (no quotes, no spaces) and restart the dev server.",
+        );
+      }
 
       const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
@@ -86,8 +95,23 @@ export function AIStyleTab() {
         }),
       });
 
+      if (!response.ok) {
+        const bodyText = await response.text();
+        console.error("OpenRouter API call failed:", {
+          status: response.status,
+          statusText: response.statusText,
+          body: bodyText,
+        });
+        let parsedMsg: string | undefined;
+        try {
+          parsedMsg = JSON.parse(bodyText)?.error?.message;
+        } catch {
+          /* not JSON */
+        }
+        throw new Error(parsedMsg ?? `HTTP ${response.status}: ${bodyText.slice(0, 200)}`);
+      }
+
       const data = await response.json();
-      if (!response.ok) throw new Error(data?.error?.message ?? `HTTP ${response.status}`);
       const raw: string = data.choices[0].message.content;
 
       const match = raw.match(/\{[\s\S]*\}/);
@@ -97,13 +121,15 @@ export function AIStyleTab() {
         ...m,
         { id: `a-${Date.now()}`, role: "assistant", style: parsed },
       ]);
-    } catch {
+    } catch (err) {
+      console.error("Error fetching AI style:", err);
+      const msg = err instanceof Error ? err.message : String(err);
       setMessages((m) => [
         ...m,
         {
           id: `a-${Date.now()}`,
           role: "assistant",
-          text: "Aura is offline right now — try again in a sec",
+          text: `Aura is offline — ${msg}`,
         },
       ]);
     } finally {
