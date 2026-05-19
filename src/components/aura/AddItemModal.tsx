@@ -1,8 +1,9 @@
 import { useRef, useState } from "react";
-import { Upload } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAura } from "@/components/aura/store";
 import type { Category } from "@/lib/aura";
+import { processGarmentImage } from "@/lib/image-process";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -49,24 +50,30 @@ export function AddItemModal() {
   }
 
   const trimmedName = name.trim();
-  const canSubmit = !!selectedFile && !!selectedCategory && trimmedName.length > 0;
+  const [processing, setProcessing] = useState(false);
+  const canSubmit = !!selectedFile && !!selectedCategory && trimmedName.length > 0 && !processing;
 
-  function confirmAdd() {
+  async function confirmAdd() {
     if (!selectedFile || !selectedCategory || !trimmedName) return;
-    const reader = new FileReader();
-    reader.onload = () => {
+    setProcessing(true);
+    try {
+      const imageUrl = await processGarmentImage(selectedFile);
       addGarment({
         id: `u-${Date.now()}`,
         name: trimmedName,
         category: selectedCategory,
         color: "#C9A98E",
-        imageUrl: reader.result as string,
+        imageUrl,
         dateAdded: new Date().toISOString(),
       });
       toast.success("Item added!", { position: "bottom-center", duration: 2000 });
       handleClose();
-    };
-    reader.readAsDataURL(selectedFile);
+    } catch (err) {
+      toast.error("Couldn't process image");
+      console.error(err);
+    } finally {
+      setProcessing(false);
+    }
   }
 
   return (
@@ -145,7 +152,13 @@ export function AddItemModal() {
             disabled={!canSubmit}
             className="w-full rounded-full bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50"
           >
-            Add Item
+            {processing ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" /> Removing background…
+              </span>
+            ) : (
+              "Add Item"
+            )}
           </Button>
         </div>
       </DialogContent>
