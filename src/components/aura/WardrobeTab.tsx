@@ -48,7 +48,7 @@ export function WardrobeTab() {
         <section className="rounded-2xl bg-card p-3 soft-shadow">
           <RailLabel>Long</RailLabel>
           <ScrollRow>
-            <div className="relative flex flex-nowrap items-start gap-3 pt-1">
+            <div className="relative flex w-max flex-nowrap items-start gap-3 pt-1 pr-4">
               <div className="absolute left-0 right-0 top-2 h-px bg-foreground/20" />
               {longs.map((g) => (
                 <HangingItem key={g.id} g={g} tall onRemove={removeGarment} onRename={renameGarment} />
@@ -160,7 +160,7 @@ function HangingRail({
 }) {
   return (
     <ScrollRow className="mt-2">
-      <div className="relative flex flex-nowrap items-start gap-3 pt-1">
+      <div className="relative flex w-max flex-nowrap items-start gap-3 pt-1 pr-4">
         <div className="absolute left-0 right-0 top-2 h-px bg-foreground/25" />
         {items.map((g) => (
           <HangingItem key={g.id} g={g} onRemove={onRemove} onRename={onRename} />
