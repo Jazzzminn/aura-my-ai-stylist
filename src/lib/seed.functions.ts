@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { INITIAL_WARDROBE } from "@/lib/aura";
+
 
 const TEST_EMAIL = "test@test.com";
 const TEST_PASSWORD = "test1234";
