@@ -15,10 +15,29 @@ import { toast } from "sonner";
 export function OutfitsTab() {
   const { outfits, wardrobe } = useAura();
   const [open, setOpen] = useState(false);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function fake() {
+  function handlePick() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setPhoto(reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  function post() {
+    if (!photo) {
+      toast.error("Add a photo first");
+      return;
+    }
     toast.success("Added! Your OOTD is live ✨");
     setOpen(false);
+    setPhoto(null);
   }
 
   return (
