@@ -4,6 +4,7 @@ import { GarmentVisual } from "@/components/aura/Garment";
 import { Button } from "@/components/ui/button";
 import { Shuffle, ChevronLeft, ChevronRight, Sparkles, Plus } from "lucide-react";
 import { toast } from "sonner";
+import type { Garment } from "@/lib/aura";
 
 type Slot = "top" | "bottom" | "shoes";
 
