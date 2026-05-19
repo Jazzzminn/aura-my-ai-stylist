@@ -152,14 +152,14 @@ function Mannequin({
         empty={shoesEmpty}
         onAdd={onAdd}
         compact
-        style={{ top: "75%", height: "25%", zIndex: 1, transform: "scale(0.9)", transformOrigin: "center top" }}
+        style={{ top: "78%", height: "22%", zIndex: 1 }}
       />
       {/* Bottom — middle layer */}
       <GarmentLayer
         garment={bottom}
         empty={bottomsEmpty}
         onAdd={onAdd}
-        style={{ top: "35%", height: "45%", zIndex: 2 }}
+        style={{ top: "40%", height: "38%", zIndex: 2 }}
       />
       {/* Top — front layer with subtle drop-shadow */}
       <GarmentLayer
@@ -167,12 +167,13 @@ function Mannequin({
         empty={topsEmpty}
         onAdd={onAdd}
         style={{
-          top: "8%",
-          height: "45%",
+          top: "5%",
+          height: "35%",
           zIndex: 3,
           filter: "drop-shadow(0 6px 10px rgba(45,42,38,0.18))",
         }}
       />
+
 
       {/* Swipe gesture zones (invisible) */}
       <SwipeZone
