@@ -121,26 +121,49 @@ function DeleteBadge({ onClick }: { onClick: () => void }) {
   );
 }
 
-function HangingRail({ items, onRemove }: { items: Garment[]; onRemove: (id: string) => void }) {
+function HangingRail({
+  items,
+  onRemove,
+  onRename,
+}: {
+  items: Garment[];
+  onRemove: (id: string) => void;
+  onRename: (id: string, name: string) => void;
+}) {
   return (
     <div className="relative mt-2 h-40">
       <div className="absolute left-2 right-2 top-2 h-px bg-foreground/25" />
       <div className="flex h-full items-start justify-around pt-1">
         {items.map((g) => (
-          <HangingItem key={g.id} g={g} onRemove={onRemove} />
+          <HangingItem key={g.id} g={g} onRemove={onRemove} onRename={onRename} />
         ))}
       </div>
     </div>
   );
 }
 
-function HangingItem({ g, tall, onRemove }: { g: Garment; tall?: boolean; onRemove?: (id: string) => void }) {
+function HangingItem({
+  g,
+  tall,
+  onRemove,
+  onRename,
+}: {
+  g: Garment;
+  tall?: boolean;
+  onRemove?: (id: string) => void;
+  onRename?: (id: string, name: string) => void;
+}) {
   return (
     <div className="relative flex flex-col items-center">
       <div className="h-3 w-3 rounded-full border border-foreground/40" />
       <div className="h-2 w-px bg-foreground/30" />
       <div className={`relative ${tall ? "h-32 w-14" : "h-28 w-16"}`}>
-        <GarmentVisual garment={g} className="!h-full !w-full" />
+        <GarmentVisual
+          garment={g}
+          className="!h-full !w-full"
+          editableName
+          onRename={onRename ? (n) => onRename(g.id, n) : undefined}
+        />
         {onRemove && <DeleteBadge onClick={() => onRemove(g.id)} />}
       </div>
     </div>
@@ -153,12 +176,14 @@ function Drawer({
   open,
   onOpenChange,
   onRemove,
+  onRename,
 }: {
   label: string;
   items: Garment[];
   open: boolean;
   onOpenChange: (b: boolean) => void;
   onRemove: (id: string) => void;
+  onRename: (id: string, name: string) => void;
 }) {
   return (
     <Collapsible open={open} onOpenChange={onOpenChange} className="rounded-2xl bg-card soft-shadow">
@@ -178,10 +203,12 @@ function Drawer({
               key={g.id}
               className="relative flex min-w-[88px] flex-col items-center rounded-xl bg-secondary/50 p-2"
             >
-              <GarmentVisual garment={g} size="sm" />
-              <span className="mt-1 text-[10px] text-muted-foreground truncate w-full text-center">
-                {g.name}
-              </span>
+              <GarmentVisual
+                garment={g}
+                size="sm"
+                editableName
+                onRename={(n) => onRename(g.id, n)}
+              />
               <DeleteBadge onClick={() => onRemove(g.id)} />
             </div>
           ))}
