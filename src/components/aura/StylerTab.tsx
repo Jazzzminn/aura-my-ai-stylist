@@ -70,7 +70,11 @@ export function StylerTab() {
           top={top}
           bottom={bottom}
           shoe={shoe}
+          topsEmpty={tops.length === 0}
+          bottomsEmpty={bottoms.length === 0}
+          shoesEmpty={shoes.length === 0}
           onSwipe={cycle}
+          onAdd={openAddItem}
         />
       </div>
 
