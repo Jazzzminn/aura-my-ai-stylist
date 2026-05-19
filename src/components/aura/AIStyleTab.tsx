@@ -17,31 +17,56 @@ type Msg =
 
 const SUGGESTED = ["Brunch with friends", "First date", "Lazy Sunday"];
 
-const AURA_SYSTEM_PROMPT = `You are Aura — a friend with great taste who knows the user's entire wardrobe and styles them daily. You are warm, specific, and slightly opinionated. You sound like a person, never like a chatbot.
+const auraResponses = {
+  brunch: {
+    headline: "Soft morning, strong outfit",
+    reasoning:
+      "The cream wide-legs and white Oxford keep it relaxed but pulled-together — nothing too try-hard for a Sunday table. Add the gold hoops and the brown suede bag to lift it without overthinking it.",
+    outfit: ["top_008", "bottom_002", "shoes_002", "acc_007", "acc_002"],
+  },
+  date: {
+    headline: "Understated, on purpose",
+    reasoning:
+      "The black crewneck over the olive trousers is the kind of outfit that looks like you didn't try, which is exactly the point. The brown Chelsea boots ground it. Keep jewellery minimal — just the silver chain.",
+    outfit: ["top_001", "bottom_001", "shoes_003", "acc_005"],
+  },
+  sunday: {
+    headline: "Nowhere to be",
+    reasoning:
+      "Black shorts, the Paris tee, and your Sambas. Comfortable but not sloppy — the Sambas do the heavy lifting here. Grab the LA cap if you're stepping outside.",
+    outfit: ["top_005", "bottom_004", "shoes_001", "acc_001"],
+  },
+  work: {
+    headline: "Serious, but make it yours",
+    reasoning:
+      "The blue stripe Oxford tucked into the black gingham skirt is an unexpected combination that works because the scale of the patterns don't compete. White sneakers keep it from going too formal.",
+    outfit: ["top_002", "bottom_006", "shoes_002", "acc_005"],
+  },
+  party: {
+    headline: "The one they remember",
+    reasoning:
+      "Royal blue sweatshirt, cream cargo trousers, and the blue Spezials — monochromatic without being matchy. The yellow crescent bag is the whole personality of this outfit.",
+    outfit: ["top_007", "bottom_005", "shoes_005", "acc_003"],
+  },
+  default: {
+    headline: "Today's pick",
+    reasoning:
+      "The white fitted tee and olive wide-legs is the cleanest combination in your wardrobe right now. Easy, adaptable, works for almost anything you've got going on today.",
+    outfit: ["top_003", "bottom_001", "shoes_001", "acc_007"],
+  },
+};
 
-You will be given:
-- The user's wardrobe as a JSON array of tagged items
-- The user's style preferences (a short summary)
-- The user's request for today
+type AuraKey = keyof typeof auraResponses;
 
-You will reply ONLY in this JSON format:
-{
-  "outfit": ["item_id_1", "item_id_2", "item_id_3"],
-  "headline": "A short serif-worthy title for this outfit",
-  "reasoning": "2-3 sentences. Specific. Reference colors, fits, or textures by name. Explain WHY this works for the occasion. Slightly opinionated. Conversational.",
-  "alternatives": [
-    {"swap_out": "item_id", "swap_in": "item_id", "why": "one short sentence"},
-    {"swap_out": "item_id", "swap_in": "item_id", "why": "one short sentence"}
-  ]
+function matchAuraKey(text: string): AuraKey {
+  const lower = text.toLowerCase();
+  if (lower.includes("brunch")) return "brunch";
+  if (lower.includes("date")) return "date";
+  if (lower.includes("sunday") || lower.includes("lazy")) return "sunday";
+  if (lower.includes("work") || lower.includes("office")) return "work";
+  if (lower.includes("party") || lower.includes("night out")) return "party";
+  return "default";
 }
-
-Style rules:
-- Reference specific items and qualities ("the cream knit", "the gold hoops")
-- Explain the coherence: how items balance each other (formality, color, texture, silhouette)
-- Match the occasion AND the weather if mentioned
-- Never use the words "chic", "effortless", or "vibe"
-- Sound like a friend texting, not a stylist writing copy
-- Never invent items not in the wardrobe JSON`;
 
 export function AIStyleTab() {
   const { wardrobe, aiEnabled } = useAura();
