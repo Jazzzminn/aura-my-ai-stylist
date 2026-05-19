@@ -157,27 +157,29 @@ function Mannequin({
         empty={shoesEmpty}
         onAdd={onAdd}
         compact
-        style={{ top: "80%", height: "20%", zIndex: 1 }}
+        style={{ top: "78%", height: "20%", width: "50%", zIndex: 1 }}
       />
-      {/* Bottom — middle layer, substantial and grounded, overlaps behind top at waist */}
+      {/* Bottom — middle layer */}
       <GarmentLayer
         garment={bottom}
         empty={bottomsEmpty}
         onAdd={onAdd}
-        style={{ top: "32%", height: "48%", zIndex: 2 }}
+        style={{ top: "36%", height: "40%", width: "70%", zIndex: 2 }}
       />
-      {/* Top — front layer, sits above bottom at waistband */}
+      {/* Top — front layer, overlaps bottom at waist */}
       <GarmentLayer
         garment={top}
         empty={topsEmpty}
         onAdd={onAdd}
         style={{
           top: "6%",
-          height: "32%",
+          height: "40%",
+          width: "70%",
           zIndex: 3,
           filter: "drop-shadow(0 6px 10px rgba(45,42,38,0.18))",
         }}
       />
+
 
 
       {/* Swipe gesture zones (invisible) */}
@@ -224,7 +226,7 @@ function GarmentLayer({
 }) {
   return (
     <div
-      className="pointer-events-none absolute left-1/2 -translate-x-1/2 w-[78%] flex items-center justify-center"
+      className="pointer-events-none absolute left-1/2 -translate-x-1/2 flex items-center justify-center"
       style={style}
     >
       {empty ? (

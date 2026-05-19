@@ -78,13 +78,12 @@ export function WardrobeTab() {
         <section className="rounded-2xl bg-card p-4 soft-shadow">
           <RailLabel>Accessories &amp; shoes</RailLabel>
           <div className="relative mt-3 overflow-x-auto wardrobe-scroll" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
-            <div className="grid grid-flow-col gap-3" style={{ gridAutoColumns: "minmax(120px, 140px)" }}>
+            <div className="grid grid-flow-col gap-3" style={{ gridAutoColumns: "minmax(160px, 160px)" }}>
               {acc.map((g) => (
                 <div key={g.id} className="flex flex-col items-center">
-                  <div className="relative aspect-square w-full rounded-xl bg-secondary/50 p-2">
+                  <div className="relative h-[200px] w-full">
                     <GarmentVisual
                       garment={g}
-                      size="sm"
                       className="!h-full !w-full"
                       editableName
                       onRename={(n) => renameGarment(g.id, n)}
@@ -143,7 +142,7 @@ function HangingRail({
 }) {
   return (
     <div className="relative mt-2 overflow-x-auto wardrobe-scroll" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
-      <div className="relative flex h-40 flex-nowrap items-start gap-3 pt-1">
+      <div className="relative flex flex-nowrap items-start gap-3 pt-1">
         <div className="absolute left-0 right-0 top-2 h-px bg-foreground/25" />
         {items.map((g) => (
           <HangingItem key={g.id} g={g} onRemove={onRemove} onRename={onRename} />
@@ -169,7 +168,7 @@ function HangingItem({
     <div className="relative flex flex-shrink-0 flex-col items-center">
       <div className="h-3 w-3 rounded-full border border-foreground/40" />
       <div className="h-2 w-px bg-foreground/30" />
-      <div className={`relative flex-shrink-0 ${tall ? "h-32 min-w-[120px] max-w-[140px]" : "h-28 min-w-[120px] max-w-[140px]"}`}>
+      <div className="relative flex-shrink-0 h-[200px] w-[160px]">
         <GarmentVisual
           garment={g}
           className="!h-full !w-full"
@@ -213,11 +212,11 @@ function Drawer({
           {items.map((g) => (
             <div
               key={g.id}
-              className="relative flex min-w-[120px] max-w-[140px] flex-shrink-0 flex-col items-center rounded-xl bg-secondary/50 p-2"
+              className="relative h-[200px] w-[160px] flex-shrink-0"
             >
               <GarmentVisual
                 garment={g}
-                size="sm"
+                className="!h-full !w-full"
                 editableName
                 onRename={(n) => onRename(g.id, n)}
               />
