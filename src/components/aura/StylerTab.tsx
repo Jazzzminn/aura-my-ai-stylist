@@ -259,26 +259,30 @@ function SwipeZone({
     >
       <div className="group relative h-full w-full">
         {children}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSwipe(-1);
-          }}
-          aria-label={`Previous ${label}`}
-          className="absolute left-[-20px] top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-60 hover:opacity-100"
-        >
-          <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSwipe(1);
-          }}
-          aria-label={`Next ${label}`}
-          className="absolute right-[-20px] top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-60 hover:opacity-100"
-        >
-          <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
-        </button>
+        {showArrows && (
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSwipe(-1);
+              }}
+              aria-label={`Previous ${label}`}
+              className="absolute left-[-20px] top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-60 hover:opacity-100"
+            >
+              <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSwipe(1);
+              }}
+              aria-label={`Next ${label}`}
+              className="absolute right-[-20px] top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-60 hover:opacity-100"
+            >
+              <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
