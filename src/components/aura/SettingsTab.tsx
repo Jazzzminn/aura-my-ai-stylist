@@ -15,6 +15,12 @@ export function SettingsTab() {
       <header className="px-5 pt-8 pb-6">
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Account</p>
         <h1 className="mt-1 text-4xl text-foreground">Settings</h1>
+        <img
+          src={auraLogo}
+          alt="Aura"
+          className="mt-6 w-40 max-w-full select-none"
+          draggable={false}
+        />
       </header>
 
       <div className="space-y-4 px-5">
