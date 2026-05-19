@@ -99,11 +99,9 @@ function NameStrip({
       onPointerUp={endPress}
       onPointerLeave={endPress}
       onPointerCancel={endPress}
-      className="group absolute inset-x-0 bottom-0 z-10"
+      className="group relative z-10 w-full border-t border-border/50"
       style={{
-        backdropFilter: "blur(6px)",
-        WebkitBackdropFilter: "blur(6px)",
-        backgroundColor: "rgba(255,255,255,0.7)",
+        backgroundColor: "rgba(255,255,255,0.85)",
       }}
     >
       {editing ? (
