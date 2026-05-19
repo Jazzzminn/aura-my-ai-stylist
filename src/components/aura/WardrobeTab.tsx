@@ -68,14 +68,6 @@ export function WardrobeTab() {
           onRemove={removeGarment}
           onRename={renameGarment}
         />
-        <Drawer
-          label="Drawer · Bottoms II"
-          open={drawer2Open}
-          onOpenChange={setDrawer2Open}
-          items={bottoms}
-          onRemove={removeGarment}
-          onRename={renameGarment}
-        />
       </div>
 
       {/* Accessories */}
