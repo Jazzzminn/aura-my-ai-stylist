@@ -19,7 +19,6 @@ const ACC_H = 240;
 export function WardrobeTab() {
   const { wardrobe, openAddItem, removeGarment, renameGarment } = useAura();
   const [drawer1Open, setDrawer1Open] = useState(true);
-  const [drawer2Open, setDrawer2Open] = useState(false);
 
   const tops = wardrobe.filter((g) => g.category === "top");
   const bottoms = wardrobe.filter((g) => g.category === "bottom");
@@ -65,14 +64,6 @@ export function WardrobeTab() {
           label="Drawer · Bottoms"
           open={drawer1Open}
           onOpenChange={setDrawer1Open}
-          items={bottoms}
-          onRemove={removeGarment}
-          onRename={renameGarment}
-        />
-        <Drawer
-          label="Drawer · Bottoms II"
-          open={drawer2Open}
-          onOpenChange={setDrawer2Open}
           items={bottoms}
           onRemove={removeGarment}
           onRename={renameGarment}
