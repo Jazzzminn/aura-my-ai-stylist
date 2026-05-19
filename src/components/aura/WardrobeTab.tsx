@@ -1,28 +1,35 @@
 import { useAura } from "@/components/aura/store";
 import { GarmentVisual } from "@/components/aura/Garment";
-import { MOCK_NEW_ITEMS } from "@/lib/aura";
+import type { Category } from "@/lib/aura";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { Plus, ChevronDown, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Plus, ChevronDown, Upload } from "lucide-react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
 
 export function WardrobeTab() {
   const { wardrobe, addGarment } = useAura();
   const [open, setOpen] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [preview, setPreview] = useState<typeof MOCK_NEW_ITEMS[number] | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | "">("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [drawer1Open, setDrawer1Open] = useState(true);
   const [drawer2Open, setDrawer2Open] = useState(false);
 
@@ -32,25 +39,38 @@ export function WardrobeTab() {
   const acc = wardrobe.filter((g) => g.category === "accessory" || g.category === "shoes");
 
   function handleOpenAdd() {
-    setPreview(null);
-    setProcessing(true);
+    setPreviewUrl(null);
+    setSelectedCategory("");
     setOpen(true);
-    setTimeout(() => {
-      const used = new Set(wardrobe.map((g) => g.id));
-      const next = MOCK_NEW_ITEMS.find((m) => !used.has(m.id)) ?? {
-        ...MOCK_NEW_ITEMS[0],
-        id: `n-${Date.now()}`,
-      };
-      setPreview(next);
-      setProcessing(false);
-    }, 2000);
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  }
+
+  function handleClose() {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    setSelectedCategory("");
+    setOpen(false);
   }
 
   function confirmAdd() {
-    if (!preview) return;
-    addGarment({ ...preview, id: `${preview.id}-${Date.now()}` });
-    toast.success(`${preview.name} added to your wardrobe`);
-    setOpen(false);
+    if (!previewUrl || !selectedCategory) return;
+    addGarment({
+      id: `u-${Date.now()}`,
+      name: "New Item",
+      category: selectedCategory,
+      color: "#C9A98E",
+    });
+    toast.success("Item added to your wardrobe");
+    handleClose();
   }
 
   return (
@@ -123,38 +143,70 @@ export function WardrobeTab() {
         <Plus className="h-6 w-6" strokeWidth={1.75} />
       </button>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="bg-card sm:max-w-sm rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl">
-              {processing ? "Processing your garment…" : "Ready to hang"}
-            </DialogTitle>
-            <DialogDescription>
-              {processing
-                ? "We're cleaning the background and detecting fabric."
-                : "We pulled the details. Add it to your closet?"}
-            </DialogDescription>
+            <DialogTitle className="text-2xl">Add to Wardrobe</DialogTitle>
           </DialogHeader>
-          <div className="flex h-56 items-center justify-center">
-            {processing ? (
-              <Loader2 className="h-10 w-10 animate-spin text-primary" strokeWidth={1.25} />
-            ) : preview ? (
-              <div className="flex flex-col items-center gap-2">
-                <div className="rounded-2xl bg-secondary/50 p-4">
-                  <GarmentVisual garment={preview} size="lg" />
-                </div>
-                <p className="serif text-xl">{preview.name}</p>
-                <p className="text-xs uppercase tracking-widest text-muted-foreground">
-                  {preview.category}
-                </p>
-              </div>
-            ) : null}
-          </div>
-          {!processing && preview && (
-            <Button onClick={confirmAdd} className="rounded-full bg-primary text-primary-foreground">
-              Add to wardrobe
+          <div className="space-y-4">
+            {/* Image input & preview */}
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              {previewUrl ? (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full rounded-2xl border border-border overflow-hidden"
+                >
+                  <img
+                    src={previewUrl}
+                    alt="Selected garment"
+                    className="w-full h-48 object-contain bg-secondary/30"
+                  />
+                </button>
+              ) : (
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex h-40 w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-secondary/30 hover:bg-secondary/50"
+                >
+                  <Upload className="h-8 w-8 text-muted-foreground" strokeWidth={1.25} />
+                  <span className="text-sm text-muted-foreground">Tap to upload an image</span>
+                </button>
+              )}
+            </div>
+
+            {/* Category select */}
+            <div className="space-y-1.5">
+              <label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Category
+              </label>
+              <Select value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as Category)}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="top">Tops</SelectItem>
+                  <SelectItem value="bottom">Bottoms</SelectItem>
+                  <SelectItem value="dress">Dresses & Coats</SelectItem>
+                  <SelectItem value="shoes">Shoes</SelectItem>
+                  <SelectItem value="accessory">Accessories</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              onClick={confirmAdd}
+              disabled={!previewUrl || !selectedCategory}
+              className="w-full rounded-full bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50"
+            >
+              Add Item
             </Button>
-          )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
