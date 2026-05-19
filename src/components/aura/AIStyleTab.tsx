@@ -257,6 +257,7 @@ function StyleCard({
           })}
         </div>
       )}
+      <p className="text-center text-[10px] text-muted-foreground">✦ AI styling coming soon</p>
     </div>
   );
 }
