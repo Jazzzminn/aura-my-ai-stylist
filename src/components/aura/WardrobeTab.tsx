@@ -53,6 +53,7 @@ export function WardrobeTab() {
           onOpenChange={setDrawer1Open}
           items={bottoms.slice(0, 4)}
           onRemove={removeGarment}
+          onRename={renameGarment}
         />
         <Drawer
           label="Drawer · Bottoms II"
@@ -60,6 +61,7 @@ export function WardrobeTab() {
           onOpenChange={setDrawer2Open}
           items={bottoms.slice(4)}
           onRemove={removeGarment}
+          onRename={renameGarment}
         />
       </div>
 
