@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   INITIAL_OUTFITS,
   INITIAL_WARDROBE,
@@ -6,11 +6,27 @@ import {
   type Outfit,
 } from "@/lib/aura";
 
+const WARDROBE_KEY = "aura.wardrobe.v1";
+
+function loadWardrobe(): Garment[] {
+  if (typeof window === "undefined") return INITIAL_WARDROBE;
+  try {
+    const raw = window.localStorage.getItem(WARDROBE_KEY);
+    if (!raw) return INITIAL_WARDROBE;
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed as Garment[];
+    return INITIAL_WARDROBE;
+  } catch {
+    return INITIAL_WARDROBE;
+  }
+}
+
 type AuraState = {
   user: { name: string; email: string };
   setUser: (u: { name: string; email: string }) => void;
   wardrobe: Garment[];
   addGarment: (g: Garment) => void;
+  removeGarment: (id: string) => void;
   outfits: Outfit[];
   addOutfit: (o: Outfit) => void;
   aiEnabled: boolean;
@@ -24,10 +40,18 @@ const Ctx = createContext<AuraState | null>(null);
 
 export function AuraProvider({ children, initialEmail }: { children: ReactNode; initialEmail?: string }) {
   const [user, setUser] = useState({ name: "You", email: initialEmail ?? "" });
-  const [wardrobe, setWardrobe] = useState<Garment[]>(INITIAL_WARDROBE);
+  const [wardrobe, setWardrobe] = useState<Garment[]>(loadWardrobe);
   const [outfits, setOutfits] = useState<Outfit[]>(INITIAL_OUTFITS);
   const [aiEnabled, setAiEnabled] = useState(true);
   const [addItemOpen, setAddItemOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(WARDROBE_KEY, JSON.stringify(wardrobe));
+    } catch {
+      // ignore quota/serialization errors
+    }
+  }, [wardrobe]);
 
   const value = useMemo<AuraState>(
     () => ({
@@ -35,6 +59,7 @@ export function AuraProvider({ children, initialEmail }: { children: ReactNode; 
       setUser,
       wardrobe,
       addGarment: (g) => setWardrobe((w) => [...w, g]),
+      removeGarment: (id) => setWardrobe((w) => w.filter((g) => g.id !== id)),
       outfits,
       addOutfit: (o) => setOutfits((arr) => [o, ...arr]),
       aiEnabled,
