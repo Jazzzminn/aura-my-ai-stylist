@@ -349,7 +349,9 @@ function StyleCard({
           })}
         </div>
       )}
-      <p className="text-center text-[10px] text-muted-foreground">✦ AI styling coming soon</p>
+      {style.source === "fallback" && (
+        <p className="text-center text-[10px] text-muted-foreground">✦ offline mode</p>
+      )}
     </div>
   );
 }
