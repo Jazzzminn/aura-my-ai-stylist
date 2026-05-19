@@ -26,7 +26,7 @@ function AppShell() {
   return (
     <AuraProvider initialEmail={email}>
       <div className="min-h-dvh bg-background">
-        <div className="mx-auto max-w-md">
+        <div className="mx-auto w-full max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-6xl px-0 sm:px-4 md:px-6 lg:px-8">
           {tab === "wardrobe" && <WardrobeTab />}
           {tab === "styler" && <StylerTab />}
           {tab === "ai" && <AIStyleTab />}
@@ -50,7 +50,7 @@ function BottomTabs({ active, onChange }: { active: TabKey; onChange: (t: TabKey
   ];
   return (
     <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-md items-stretch justify-between px-2 py-2">
+      <div className="mx-auto flex w-full max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-5xl xl:max-w-6xl items-stretch justify-between px-2 py-2">
         {items.map(({ key, label, Icon }) => {
           const isActive = active === key;
           return (
