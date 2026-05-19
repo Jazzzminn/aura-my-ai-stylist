@@ -34,6 +34,7 @@ function AppShell() {
           {tab === "settings" && <SettingsTab />}
         </div>
         <BottomTabs active={tab} onChange={setTab} />
+        <AddItemModal />
       </div>
     </AuraProvider>
   );
