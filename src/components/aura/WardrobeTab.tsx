@@ -10,7 +10,7 @@ import { useState } from "react";
 import type { Garment } from "@/lib/aura";
 
 export function WardrobeTab() {
-  const { wardrobe, openAddItem, removeGarment } = useAura();
+  const { wardrobe, openAddItem, removeGarment, renameGarment } = useAura();
   const [drawer1Open, setDrawer1Open] = useState(true);
   const [drawer2Open, setDrawer2Open] = useState(false);
 
