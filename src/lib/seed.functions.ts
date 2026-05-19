@@ -38,30 +38,9 @@ export const ensureTestAccount = createServerFn({ method: "POST" }).handler(
       userId = created.user.id;
     }
 
-    // 2. Seed garments only if none yet for this user
-    const { count, error: countErr } = await supabaseAdmin
-      .from("garments")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId);
-    if (countErr) {
-      console.error("count failed", countErr);
-      return { ok: false as const, error: countErr.message };
-    }
-    if ((count ?? 0) === 0) {
-      const rows = INITIAL_WARDROBE.map((g) => ({
-        user_id: userId!,
-        name: g.name,
-        category: g.category,
-        color: g.color,
-        pattern: g.pattern ?? null,
-        image_url: g.imageUrl ?? null,
-      }));
-      const { error: insErr } = await supabaseAdmin.from("garments").insert(rows);
-      if (insErr) {
-        console.error("seed insert failed", insErr);
-        return { ok: false as const, error: insErr.message };
-      }
-    }
+    // No garment seeding — the demo account starts empty so users only see
+    // real clothes they add (which then sync across devices via Supabase).
+
 
     return { ok: true as const, email: TEST_EMAIL };
   },
