@@ -34,7 +34,7 @@ const auraResponses = {
     headline: "Nowhere to be",
     reasoning:
       "Black shorts, the Paris tee, and your Sambas. Comfortable but not sloppy — the Sambas do the heavy lifting here. Grab the LA cap if you're stepping outside.",
-    outfit: ["top_005", "bottom_004", "shoes_001", "acc_001"],
+    outfit: ["t4", "b4", "s2", "a3"],
   },
   work: {
     headline: "Serious, but make it yours",
