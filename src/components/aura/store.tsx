@@ -21,6 +21,8 @@ function loadWardrobe(): Garment[] {
   }
 }
 
+export type Post = { id: string; name: string; photoUrl: string };
+
 type AuraState = {
   user: { name: string; email: string };
   setUser: (u: { name: string; email: string }) => void;
@@ -30,6 +32,10 @@ type AuraState = {
   renameGarment: (id: string, name: string) => void;
   outfits: Outfit[];
   addOutfit: (o: Outfit) => void;
+  posts: Post[];
+  addPost: (p: Post) => void;
+  renamePost: (id: string, name: string) => void;
+  removePost: (id: string) => void;
   aiEnabled: boolean;
   setAiEnabled: (v: boolean) => void;
   addItemOpen: boolean;
