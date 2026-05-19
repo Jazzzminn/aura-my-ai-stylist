@@ -17,6 +17,32 @@ type Msg =
 
 const SUGGESTED = ["Brunch with friends", "First date", "Lazy Sunday"];
 
+const AURA_SYSTEM_PROMPT = `You are Aura — a friend with great taste who knows the user's entire wardrobe and styles them daily. You are warm, specific, and slightly opinionated. You sound like a person, never like a chatbot.
+
+You will be given:
+- The user's wardrobe as a JSON array of tagged items
+- The user's style preferences (a short summary)
+- The user's request for today
+
+You will reply ONLY in this JSON format:
+{
+  "outfit": ["item_id_1", "item_id_2", "item_id_3"],
+  "headline": "A short serif-worthy title for this outfit",
+  "reasoning": "2-3 sentences. Specific. Reference colors, fits, or textures by name. Explain WHY this works for the occasion. Slightly opinionated. Conversational.",
+  "alternatives": [
+    {"swap_out": "item_id", "swap_in": "item_id", "why": "one short sentence"},
+    {"swap_out": "item_id", "swap_in": "item_id", "why": "one short sentence"}
+  ]
+}
+
+Style rules:
+- Reference specific items and qualities ("the cream knit", "the gold hoops")
+- Explain the coherence: how items balance each other (formality, color, texture, silhouette)
+- Match the occasion AND the weather if mentioned
+- Never use the words "chic", "effortless", or "vibe"
+- Sound like a friend texting, not a stylist writing copy
+- Never invent items not in the wardrobe JSON`;
+
 export function AIStyleTab() {
   const { wardrobe, aiEnabled } = useAura();
   const [messages, setMessages] = useState<Msg[]>([
@@ -37,29 +63,47 @@ export function AIStyleTab() {
     setInput("");
     setTyping(true);
 
+    const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY as string | undefined;
+    const userMessage = `My wardrobe: ${JSON.stringify(wardrobe)}. My style: relaxed, warm neutrals, slightly oversized. Today's request: ${t}`;
+
     try {
-      const res = await fetch("/api/ai-style", {
+      if (!OPENROUTER_API_KEY) throw new Error("Missing VITE_OPENROUTER_API_KEY");
+
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "Aura",
+        },
         body: JSON.stringify({
-          wardrobe,
-          style: "relaxed, warm neutrals, slightly oversized",
-          message: t,
+          model: "anthropic/claude-sonnet-4",
+          messages: [
+            { role: "system", content: AURA_SYSTEM_PROMPT },
+            { role: "user", content: userMessage },
+          ],
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Request failed");
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.error?.message ?? `HTTP ${response.status}`);
+      const raw: string = data.choices[0].message.content;
+
+      const match = raw.match(/\{[\s\S]*\}/);
+      const parsed = JSON.parse(match ? match[0] : raw) as StyleResponse;
+
       setMessages((m) => [
         ...m,
-        { id: `a-${Date.now()}`, role: "assistant", style: data as StyleResponse },
+        { id: `a-${Date.now()}`, role: "assistant", style: parsed },
       ]);
-    } catch (e) {
+    } catch {
       setMessages((m) => [
         ...m,
         {
           id: `a-${Date.now()}`,
           role: "assistant",
-          text: `Sorry — I couldn't put that together right now. ${e instanceof Error ? e.message : ""}`,
+          text: "Aura is offline right now — try again in a sec",
         },
       ]);
     } finally {
