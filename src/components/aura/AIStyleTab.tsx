@@ -22,37 +22,37 @@ const auraResponses = {
     headline: "Soft morning, strong outfit",
     reasoning:
       "The cream wide-legs and white Oxford keep it relaxed but pulled-together — nothing too try-hard for a Sunday table. Add the gold hoops and the brown suede bag to lift it without overthinking it.",
-    outfit: ["top_008", "bottom_002", "shoes_002", "acc_007", "acc_002"],
+    outfit: ["t3", "b1", "s2", "a2", "a1"],
   },
   date: {
     headline: "Understated, on purpose",
     reasoning:
       "The black crewneck over the olive trousers is the kind of outfit that looks like you didn't try, which is exactly the point. The brown Chelsea boots ground it. Keep jewellery minimal — just the silver chain.",
-    outfit: ["top_001", "bottom_001", "shoes_003", "acc_005"],
+    outfit: ["t2", "b3", "s1", "a2"],
   },
   sunday: {
     headline: "Nowhere to be",
     reasoning:
       "Black shorts, the Paris tee, and your Sambas. Comfortable but not sloppy — the Sambas do the heavy lifting here. Grab the LA cap if you're stepping outside.",
-    outfit: ["top_005", "bottom_004", "shoes_001", "acc_001"],
+    outfit: ["t4", "b4", "s2", "a3"],
   },
   work: {
     headline: "Serious, but make it yours",
     reasoning:
       "The blue stripe Oxford tucked into the black gingham skirt is an unexpected combination that works because the scale of the patterns don't compete. White sneakers keep it from going too formal.",
-    outfit: ["top_002", "bottom_006", "shoes_002", "acc_005"],
+    outfit: ["t1", "b2", "s2", "a2"],
   },
   party: {
     headline: "The one they remember",
     reasoning:
       "Royal blue sweatshirt, cream cargo trousers, and the blue Spezials — monochromatic without being matchy. The yellow crescent bag is the whole personality of this outfit.",
-    outfit: ["top_007", "bottom_005", "shoes_005", "acc_003"],
+    outfit: ["t2", "b3", "s3", "a1"],
   },
   default: {
     headline: "Today's pick",
     reasoning:
       "The white fitted tee and olive wide-legs is the cleanest combination in your wardrobe right now. Easy, adaptable, works for almost anything you've got going on today.",
-    outfit: ["top_003", "bottom_001", "shoes_001", "acc_007"],
+    outfit: ["t1", "b1", "s2", "a1"],
   },
 };
 
@@ -88,10 +88,23 @@ export function AIStyleTab() {
     setInput("");
     setTyping(true);
 
+    console.log(
+      "Wardrobe state:",
+      wardrobe.map((g) => ({ id: g.id, name: g.name, category: g.category })),
+    );
+
     try {
       await new Promise((r) => setTimeout(r, 700));
       const key = matchAuraKey(t);
       const matched = auraResponses[key];
+      const wardrobeIds = new Set(wardrobe.map((g) => g.id));
+      const missing = matched.outfit.filter((id) => !wardrobeIds.has(id));
+      if (missing.length > 0) {
+        console.warn(
+          `[Aura] Outfit "${key}" references IDs not in wardrobe:`,
+          missing,
+        );
+      }
       const style: StyleResponse = {
         outfit: matched.outfit,
         headline: matched.headline,
