@@ -108,6 +108,7 @@ async function getAuraOutfit(
 
 export function AIStyleTab() {
   const { wardrobe, aiEnabled } = useAura();
+  const callAura = useServerFn(generateAuraOutfit);
   const [messages, setMessages] = useState<Msg[]>([
     { id: "w", role: "assistant", text: "Hi! What's the vibe today? ☁️" },
   ]);
