@@ -23,6 +23,24 @@ export function GarmentVisual({
   onRename?: (newName: string) => void;
 }) {
   const dims = size === "sm" ? "h-14 w-14" : size === "lg" ? "h-40 w-40" : "h-24 w-24";
+  if (editableName) {
+    return (
+      <div className={cn("relative flex flex-col overflow-hidden rounded-xl bg-white", dims, className)}>
+        <div className="flex flex-1 min-h-0 items-center justify-center p-2">
+          {garment.imageUrl ? (
+            <img
+              src={garment.imageUrl}
+              alt={garment.name}
+              className="h-full w-full object-contain"
+            />
+          ) : (
+            <Shape category={garment.category} color={garment.color} />
+          )}
+        </div>
+        <NameStrip name={garment.name} onRename={onRename} />
+      </div>
+    );
+  }
   return (
     <div className={cn("relative flex items-center justify-center overflow-hidden rounded-xl", dims, className)}>
       {garment.imageUrl ? (
@@ -33,9 +51,6 @@ export function GarmentVisual({
         />
       ) : (
         <Shape category={garment.category} color={garment.color} />
-      )}
-      {editableName && (
-        <NameStrip name={garment.name} onRename={onRename} />
       )}
     </div>
   );
