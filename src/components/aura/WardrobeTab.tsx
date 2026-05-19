@@ -136,7 +136,7 @@ function ScrollRow({ children, className = "" }: { children: React.ReactNode; cl
   return (
     <div className={`relative ${className}`}>
       <div
-        className="overflow-x-auto wardrobe-scroll"
+        className="overflow-x-auto wardrobe-scroll pt-2 -mt-2"
         style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}
       >
         {children}
