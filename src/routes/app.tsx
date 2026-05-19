@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuraProvider } from "@/components/aura/store";
+import { AddItemModal } from "@/components/aura/AddItemModal";
 import { WardrobeTab } from "@/components/aura/WardrobeTab";
 import { StylerTab } from "@/components/aura/StylerTab";
 import { AIStyleTab } from "@/components/aura/AIStyleTab";
@@ -33,6 +34,7 @@ function AppShell() {
           {tab === "settings" && <SettingsTab />}
         </div>
         <BottomTabs active={tab} onChange={setTab} />
+        <AddItemModal />
       </div>
     </AuraProvider>
   );

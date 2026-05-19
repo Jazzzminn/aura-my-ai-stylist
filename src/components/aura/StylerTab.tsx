@@ -2,13 +2,13 @@ import { useMemo, useRef, useState } from "react";
 import { useAura } from "@/components/aura/store";
 import { GarmentVisual } from "@/components/aura/Garment";
 import { Button } from "@/components/ui/button";
-import { Shuffle, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Shuffle, ChevronLeft, ChevronRight, Sparkles, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 type Slot = "top" | "bottom" | "shoes";
 
 export function StylerTab() {
-  const { wardrobe, addOutfit } = useAura();
+  const { wardrobe, addOutfit, openAddItem } = useAura();
   const tops = useMemo(() => wardrobe.filter((g) => g.category === "top"), [wardrobe]);
   const bottoms = useMemo(() => wardrobe.filter((g) => g.category === "bottom"), [wardrobe]);
   const shoes = useMemo(() => wardrobe.filter((g) => g.category === "shoes"), [wardrobe]);
@@ -70,7 +70,11 @@ export function StylerTab() {
           top={top}
           bottom={bottom}
           shoe={shoe}
+          topsEmpty={tops.length === 0}
+          bottomsEmpty={bottoms.length === 0}
+          shoesEmpty={shoes.length === 0}
           onSwipe={cycle}
+          onAdd={openAddItem}
         />
       </div>
 
@@ -106,12 +110,20 @@ function Mannequin({
   top,
   bottom,
   shoe,
+  topsEmpty,
+  bottomsEmpty,
+  shoesEmpty,
   onSwipe,
+  onAdd,
 }: {
   top?: any;
   bottom?: any;
   shoe?: any;
+  topsEmpty: boolean;
+  bottomsEmpty: boolean;
+  shoesEmpty: boolean;
   onSwipe: (slot: Slot, dir: 1 | -1) => void;
+  onAdd: () => void;
 }) {
   return (
     <div className="relative mx-auto aspect-[3/5] w-full max-w-xs">
@@ -142,11 +154,16 @@ function Mannequin({
         className="absolute left-1/2 top-[14%] z-10 h-[38%] w-[78%] -translate-x-1/2"
         onSwipe={(d) => onSwipe("top", d)}
         label="top"
+        showArrows={!topsEmpty}
       >
-        {top && (
-          <div className="pointer-events-none flex h-full w-full items-center justify-center">
-            <GarmentVisual garment={top} className="!h-[110%] !w-[100%]" />
-          </div>
+        {topsEmpty ? (
+          <EmptySlot onAdd={onAdd} />
+        ) : (
+          top && (
+            <div className="pointer-events-none flex h-full w-full items-center justify-center">
+              <GarmentVisual garment={top} className="!h-[110%] !w-[100%]" />
+            </div>
+          )
         )}
       </SwipeZone>
 
@@ -154,11 +171,16 @@ function Mannequin({
         className="absolute left-1/2 top-[46%] z-10 h-[35%] w-[60%] -translate-x-1/2"
         onSwipe={(d) => onSwipe("bottom", d)}
         label="bottom"
+        showArrows={!bottomsEmpty}
       >
-        {bottom && (
-          <div className="pointer-events-none flex h-full w-full items-center justify-center">
-            <GarmentVisual garment={bottom} className="!h-[110%] !w-[100%]" />
-          </div>
+        {bottomsEmpty ? (
+          <EmptySlot onAdd={onAdd} />
+        ) : (
+          bottom && (
+            <div className="pointer-events-none flex h-full w-full items-center justify-center">
+              <GarmentVisual garment={bottom} className="!h-[110%] !w-[100%]" />
+            </div>
+          )
         )}
       </SwipeZone>
 
@@ -166,14 +188,40 @@ function Mannequin({
         className="absolute left-1/2 bottom-[2%] z-10 h-[14%] w-[70%] -translate-x-1/2"
         onSwipe={(d) => onSwipe("shoes", d)}
         label="shoes"
+        showArrows={!shoesEmpty}
       >
-        {shoe && (
-          <div className="pointer-events-none flex h-full w-full items-center justify-center">
-            <GarmentVisual garment={shoe} className="!h-[130%] !w-[80%]" />
-          </div>
+        {shoesEmpty ? (
+          <EmptySlot onAdd={onAdd} compact />
+        ) : (
+          shoe && (
+            <div className="pointer-events-none flex h-full w-full items-center justify-center">
+              <GarmentVisual garment={shoe} className="!h-[130%] !w-[80%]" />
+            </div>
+          )
         )}
       </SwipeZone>
     </div>
+  );
+}
+
+function EmptySlot({ onAdd, compact }: { onAdd: () => void; compact?: boolean }) {
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onAdd();
+      }}
+      className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-border bg-card/70 px-2 text-center hover:bg-card"
+    >
+      <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-primary-foreground">
+        <Plus className="h-4 w-4" strokeWidth={1.75} />
+      </span>
+      {!compact && (
+        <span className="text-[11px] leading-tight text-muted-foreground">
+          Add items to your wardrobe
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -182,11 +230,13 @@ function SwipeZone({
   className,
   onSwipe,
   label,
+  showArrows = true,
 }: {
   children: React.ReactNode;
   className?: string;
   onSwipe: (dir: 1 | -1) => void;
   label: string;
+  showArrows?: boolean;
 }) {
   const startX = useRef<number | null>(null);
   return (
@@ -209,26 +259,30 @@ function SwipeZone({
     >
       <div className="group relative h-full w-full">
         {children}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSwipe(-1);
-          }}
-          aria-label={`Previous ${label}`}
-          className="absolute left-[-20px] top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-60 hover:opacity-100"
-        >
-          <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onSwipe(1);
-          }}
-          aria-label={`Next ${label}`}
-          className="absolute right-[-20px] top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-60 hover:opacity-100"
-        >
-          <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
-        </button>
+        {showArrows && (
+          <>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSwipe(-1);
+              }}
+              aria-label={`Previous ${label}`}
+              className="absolute left-[-20px] top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-60 hover:opacity-100"
+            >
+              <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSwipe(1);
+              }}
+              aria-label={`Next ${label}`}
+              className="absolute right-[-20px] top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full bg-card/80 text-foreground soft-shadow opacity-60 hover:opacity-100"
+            >
+              <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
