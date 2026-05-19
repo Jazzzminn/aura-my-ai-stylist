@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { useAura } from "@/components/aura/store";
 import { GarmentVisual } from "@/components/aura/Garment";
 import { Button } from "@/components/ui/button";
-import { Shuffle, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { Shuffle, ChevronLeft, ChevronRight, Sparkles, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 type Slot = "top" | "bottom" | "shoes";
