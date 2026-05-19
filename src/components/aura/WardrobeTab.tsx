@@ -21,6 +21,11 @@ export function WardrobeTab() {
 
   return (
     <div className="relative pb-28">
+      <style>{`
+        .wardrobe-scroll::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
       <header className="px-5 pt-8 pb-4">
         <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Your closet</p>
         <h1 className="mt-1 text-4xl text-foreground">Wardrobe</h1>
@@ -30,17 +35,20 @@ export function WardrobeTab() {
         {/* Hanging rail — tops */}
         <section className="col-span-2 rounded-2xl bg-card p-4 soft-shadow">
           <RailLabel>Hanging rail</RailLabel>
-          <HangingRail items={tops.slice(0, 3)} onRemove={removeGarment} onRename={renameGarment} />
+          <HangingRail items={tops} onRemove={removeGarment} onRename={renameGarment} />
         </section>
 
         {/* Tall hanging — dresses/coats */}
         <section className="rounded-2xl bg-card p-3 soft-shadow">
           <RailLabel>Long</RailLabel>
-          <div className="relative mt-2 flex h-56 flex-col items-center gap-2 overflow-hidden">
-            <div className="absolute top-2 left-3 right-3 h-px bg-foreground/20" />
-            {longs.slice(0, 2).map((g) => (
-              <HangingItem key={g.id} g={g} tall onRemove={removeGarment} onRename={renameGarment} />
-            ))}
+          <div className="relative mt-2 overflow-x-auto wardrobe-scroll" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+            <div className="relative flex flex-nowrap items-start gap-3 pt-1">
+              <div className="absolute left-0 right-0 top-2 h-px bg-foreground/20" />
+              {longs.map((g) => (
+                <HangingItem key={g.id} g={g} tall onRemove={removeGarment} onRename={renameGarment} />
+              ))}
+            </div>
+            <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none z-10" style={{ background: "linear-gradient(to right, transparent, oklch(0.984 0.01 80))" }} />
           </div>
         </section>
       </div>
@@ -51,7 +59,7 @@ export function WardrobeTab() {
           label="Drawer · Bottoms"
           open={drawer1Open}
           onOpenChange={setDrawer1Open}
-          items={bottoms.slice(0, 4)}
+          items={bottoms}
           onRemove={removeGarment}
           onRename={renameGarment}
         />
@@ -59,7 +67,7 @@ export function WardrobeTab() {
           label="Drawer · Bottoms II"
           open={drawer2Open}
           onOpenChange={setDrawer2Open}
-          items={bottoms.slice(4)}
+          items={bottoms}
           onRemove={removeGarment}
           onRename={renameGarment}
         />
@@ -68,22 +76,25 @@ export function WardrobeTab() {
       {/* Accessories */}
       <div className="mt-4 px-5">
         <section className="rounded-2xl bg-card p-4 soft-shadow">
-          <RailLabel>Accessories & shoes</RailLabel>
-          <div className="mt-3 grid grid-cols-4 gap-3">
-            {acc.map((g) => (
-              <div key={g.id} className="flex flex-col items-center">
-                <div className="relative aspect-square w-full rounded-xl bg-secondary/50 p-2">
-                  <GarmentVisual
-                    garment={g}
-                    size="sm"
-                    className="!h-full !w-full"
-                    editableName
-                    onRename={(n) => renameGarment(g.id, n)}
-                  />
-                  <DeleteBadge onClick={() => removeGarment(g.id)} />
+          <RailLabel>Accessories &amp; shoes</RailLabel>
+          <div className="relative mt-3 overflow-x-auto wardrobe-scroll" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+            <div className="grid grid-flow-col gap-3" style={{ gridAutoColumns: "minmax(120px, 140px)" }}>
+              {acc.map((g) => (
+                <div key={g.id} className="flex flex-col items-center">
+                  <div className="relative aspect-square w-full rounded-xl bg-secondary/50 p-2">
+                    <GarmentVisual
+                      garment={g}
+                      size="sm"
+                      className="!h-full !w-full"
+                      editableName
+                      onRename={(n) => renameGarment(g.id, n)}
+                    />
+                    <DeleteBadge onClick={() => removeGarment(g.id)} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none z-10" style={{ background: "linear-gradient(to right, transparent, oklch(0.984 0.01 80))" }} />
           </div>
         </section>
       </div>
@@ -131,13 +142,14 @@ function HangingRail({
   onRename: (id: string, name: string) => void;
 }) {
   return (
-    <div className="relative mt-2 h-40">
-      <div className="absolute left-2 right-2 top-2 h-px bg-foreground/25" />
-      <div className="flex h-full items-start justify-around pt-1">
+    <div className="relative mt-2 overflow-x-auto wardrobe-scroll" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
+      <div className="relative flex h-40 flex-nowrap items-start gap-3 pt-1">
+        <div className="absolute left-0 right-0 top-2 h-px bg-foreground/25" />
         {items.map((g) => (
           <HangingItem key={g.id} g={g} onRemove={onRemove} onRename={onRename} />
         ))}
       </div>
+      <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none z-10" style={{ background: "linear-gradient(to right, transparent, oklch(0.984 0.01 80))" }} />
     </div>
   );
 }
@@ -154,10 +166,10 @@ function HangingItem({
   onRename?: (id: string, name: string) => void;
 }) {
   return (
-    <div className="relative flex flex-col items-center">
+    <div className="relative flex flex-shrink-0 flex-col items-center">
       <div className="h-3 w-3 rounded-full border border-foreground/40" />
       <div className="h-2 w-px bg-foreground/30" />
-      <div className={`relative ${tall ? "h-32 w-14" : "h-28 w-16"}`}>
+      <div className={`relative flex-shrink-0 ${tall ? "h-32 min-w-[120px] max-w-[140px]" : "h-28 min-w-[120px] max-w-[140px]"}`}>
         <GarmentVisual
           garment={g}
           className="!h-full !w-full"
@@ -194,14 +206,14 @@ function Drawer({
         />
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="flex gap-3 overflow-x-auto px-4 pb-4">
+        <div className="relative flex gap-3 overflow-x-auto wardrobe-scroll px-4 pb-4" style={{ scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
           {items.length === 0 && (
             <div className="py-4 text-xs text-muted-foreground">Empty drawer</div>
           )}
           {items.map((g) => (
             <div
               key={g.id}
-              className="relative flex min-w-[88px] flex-col items-center rounded-xl bg-secondary/50 p-2"
+              className="relative flex min-w-[120px] max-w-[140px] flex-shrink-0 flex-col items-center rounded-xl bg-secondary/50 p-2"
             >
               <GarmentVisual
                 garment={g}
@@ -212,6 +224,7 @@ function Drawer({
               <DeleteBadge onClick={() => onRemove(g.id)} />
             </div>
           ))}
+          <div className="absolute right-0 top-0 bottom-0 w-8 pointer-events-none z-10" style={{ background: "linear-gradient(to right, transparent, oklch(0.984 0.01 80))" }} />
         </div>
       </CollapsibleContent>
     </Collapsible>
