@@ -23,6 +23,7 @@ export function AddItemModal() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | "">("");
+  const [name, setName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function reset() {
@@ -30,6 +31,7 @@ export function AddItemModal() {
     setPreviewUrl(null);
     setSelectedFile(null);
     setSelectedCategory("");
+    setName("");
   }
 
   function handleClose() {
@@ -46,13 +48,16 @@ export function AddItemModal() {
     }
   }
 
+  const trimmedName = name.trim();
+  const canSubmit = !!selectedFile && !!selectedCategory && trimmedName.length > 0;
+
   function confirmAdd() {
-    if (!selectedFile || !selectedCategory) return;
+    if (!selectedFile || !selectedCategory || !trimmedName) return;
     const reader = new FileReader();
     reader.onload = () => {
       addGarment({
         id: `u-${Date.now()}`,
-        name: "New Item",
+        name: trimmedName,
         category: selectedCategory,
         color: "#C9A98E",
         imageUrl: reader.result as string,
