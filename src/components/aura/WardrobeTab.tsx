@@ -81,79 +81,12 @@ export function WardrobeTab() {
 
       {/* Floating add */}
       <button
-        onClick={handleOpenAdd}
+        onClick={openAddItem}
         aria-label="Add garment"
         className="fixed bottom-24 right-5 z-20 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground soft-shadow-lg hover:scale-105 active:scale-95"
       >
         <Plus className="h-6 w-6" strokeWidth={1.75} />
       </button>
-
-      <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="bg-card sm:max-w-sm rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">Add to Wardrobe</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {/* Image input & preview */}
-            <div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              {previewUrl ? (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full rounded-2xl border border-border overflow-hidden"
-                >
-                  <img
-                    src={previewUrl}
-                    alt="Selected garment"
-                    className="w-full h-48 object-contain bg-secondary/30"
-                  />
-                </button>
-              ) : (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex h-40 w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-secondary/30 hover:bg-secondary/50"
-                >
-                  <Upload className="h-8 w-8 text-muted-foreground" strokeWidth={1.25} />
-                  <span className="text-sm text-muted-foreground">Tap to upload an image</span>
-                </button>
-              )}
-            </div>
-
-            {/* Category select */}
-            <div className="space-y-1.5">
-              <label className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Category
-              </label>
-              <Select value={selectedCategory} onValueChange={(v) => setSelectedCategory(v as Category)}>
-                <SelectTrigger className="rounded-xl">
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="top">Tops</SelectItem>
-                  <SelectItem value="bottom">Bottoms</SelectItem>
-                  <SelectItem value="dress">Dresses & Coats</SelectItem>
-                  <SelectItem value="shoes">Shoes</SelectItem>
-                  <SelectItem value="accessory">Accessories</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              onClick={confirmAdd}
-              disabled={!previewUrl || !selectedCategory}
-              className="w-full rounded-full bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50"
-            >
-              Add Item
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
