@@ -28,6 +28,7 @@ export function WardrobeTab() {
   const { wardrobe, addGarment } = useAura();
   const [open, setOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | "">("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [drawer1Open, setDrawer1Open] = useState(true);
@@ -40,6 +41,7 @@ export function WardrobeTab() {
 
   function handleOpenAdd() {
     setPreviewUrl(null);
+    setSelectedFile(null);
     setSelectedCategory("");
     setOpen(true);
   }
@@ -47,30 +49,37 @@ export function WardrobeTab() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   }
 
   function handleClose() {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
+    setSelectedFile(null);
     setSelectedCategory("");
     setOpen(false);
   }
 
   function confirmAdd() {
-    if (!previewUrl || !selectedCategory) return;
-    addGarment({
-      id: `u-${Date.now()}`,
-      name: "New Item",
-      category: selectedCategory,
-      color: "#C9A98E",
-    });
-    toast.success("Item added to your wardrobe");
-    handleClose();
+    if (!selectedFile || !selectedCategory) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      addGarment({
+        id: `u-${Date.now()}`,
+        name: "New Item",
+        category: selectedCategory,
+        color: "#C9A98E",
+        imageUrl: dataUrl,
+        dateAdded: new Date().toISOString(),
+      });
+      toast.success("Item added!", { position: "bottom-center", duration: 2000 });
+      handleClose();
+    };
+    reader.readAsDataURL(selectedFile);
   }
 
   return (

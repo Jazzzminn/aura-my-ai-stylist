@@ -6,6 +6,8 @@ export type Garment = {
   category: Category;
   color: string; // tailwind-ish swatch (hex)
   pattern?: string;
+  imageUrl?: string;
+  dateAdded?: string;
 };
 
 export type Outfit = {

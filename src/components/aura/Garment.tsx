@@ -17,7 +17,15 @@ export function GarmentVisual({
   const dims = size === "sm" ? "h-14 w-14" : size === "lg" ? "h-40 w-40" : "h-24 w-24";
   return (
     <div className={cn("relative flex items-center justify-center", dims, className)}>
-      <Shape category={garment.category} color={garment.color} />
+      {garment.imageUrl ? (
+        <img
+          src={garment.imageUrl}
+          alt={garment.name}
+          className="h-full w-full rounded-xl object-cover border border-border/60"
+        />
+      ) : (
+        <Shape category={garment.category} color={garment.color} />
+      )}
     </div>
   );
 }
