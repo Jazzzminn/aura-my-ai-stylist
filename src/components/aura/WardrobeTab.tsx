@@ -63,18 +63,10 @@ export function WardrobeTab() {
 
   function confirmAdd() {
     if (!previewUrl || !selectedCategory) return;
-    const categoryMap: Record<string, Category> = {
-      tops: "top",
-      bottoms: "bottom",
-      dresses_coats: "dress",
-      shoes: "shoes",
-      accessories: "accessory",
-    };
-    const cat = categoryMap[selectedCategory];
     addGarment({
       id: `u-${Date.now()}`,
       name: "New Item",
-      category: cat,
+      category: selectedCategory,
       color: "#C9A98E",
     });
     toast.success("Item added to your wardrobe");
